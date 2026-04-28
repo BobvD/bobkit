@@ -45,6 +45,7 @@ jobs:
           name: bobkit-claude-plugin
           path: dist/claude-plugin
           if-no-files-found: error
+          include-hidden-files: true
 
       - name: Upload Claude marketplace artifact
         uses: actions/upload-artifact@v4
@@ -52,6 +53,7 @@ jobs:
           name: bobkit-claude-marketplace
           path: dist/claude-marketplace
           if-no-files-found: error
+          include-hidden-files: true
 
   publish:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
