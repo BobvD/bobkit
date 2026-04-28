@@ -38,10 +38,10 @@ if (!existsSync(marketplaceSource)) {
 rmSync(pluginOutputDir, { recursive: true, force: true });
 rmSync(marketplaceOutputDir, { recursive: true, force: true });
 
-run('npx', [
-  '--yes',
-  'rulesync@8.13.0',
-  'generate',
+run('npm', [
+  'run',
+  'rulesync:generate',
+  '--',
   '--targets',
   'claudecode',
   '--features',

@@ -87,8 +87,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch --orphan "$DEPLOY_BRANCH"
+          git rm -rf --cached . || true
           find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -R "$publish_dir"/. .
-          git add .
+          git add -A
           git commit -m "Deploy Claude marketplace"
           git push --force origin "$DEPLOY_BRANCH"
