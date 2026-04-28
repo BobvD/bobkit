@@ -37,11 +37,34 @@ Create a merge request or pull request for the current git repository. Prefer do
 5. Push the branch if needed:
    - If the branch has no upstream, ask before running `git push -u <remote> <branch>`.
    - If the branch has an upstream, run `git push` only when there are local commits not on the remote.
-6. Create the request:
-   - GitHub: use `gh pr create --fill` by default. If the repo requires a draft, use `--draft`.
-   - GitLab: use `glab mr create --fill` by default. If the repo requires a draft, use `--draft`.
+6. Write the title and description:
+   - Use the current user request, relevant conversation context, branch name, commit messages, and diff summary. Useful commands: `git log --oneline @{u}..HEAD`, `git diff --stat @{u}...HEAD`, and `git diff --name-status @{u}...HEAD`.
+   - If no upstream exists yet, compare against the default branch instead.
+   - Detect issue or ticket identifiers from the branch name, commit messages, user request, or conversation context. Examples: `ABC-123`, `PROJ-456`, `#123`.
+   - Title convention: `[TICKET] type(scope): concise summary` when a ticket exists, otherwise `type(scope): concise summary`.
+   - Choose `type` from `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`, `build`, or `perf`.
+   - Choose `scope` from the touched module, package, feature, or directory. Keep it lowercase and short.
+   - Keep the title strong, specific, and ideally under 72 characters. Do not end it with a period.
+   - Keep the description concise and readable. Prefer:
+
+```markdown
+## Summary
+- What changed.
+- Any important user-facing effect.
+
+## Why
+- The reason behind the change, using conversation context when available.
+
+## Validation
+- Checks run, or `Not run (reason)`.
+```
+
+   - Avoid long narratives, generated filler, and implementation trivia. Two to five bullets total is usually enough.
+7. Create the request:
+   - GitHub: use `gh pr create --title "$title" --body-file "$body_file"` by default. If the repo requires a draft, use `--draft`.
+   - GitLab: use `glab mr create --title "$title" --description "$description"` by default. If the repo requires a draft, use `--draft`.
    - If the CLI cannot infer base/head, read the default branch from the remote and pass base/head explicitly.
-7. Report the URL and any remaining manual steps.
+8. Report the URL and any remaining manual steps.
 
 ## Guardrails
 

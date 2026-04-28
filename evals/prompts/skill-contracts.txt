@@ -8,4 +8,7 @@ The create-mr skill should:
 - Use `gh` for GitHub pull requests and `glab` for GitLab merge requests.
 - Ask the user to install `gh` or `glab` when the required CLI is missing.
 - Ask the user to authenticate with `gh auth login` or `glab auth login` when the CLI is not configured.
+- Write a concise human-readable title using `[TICKET] type(scope): summary` or `type(scope): summary`.
+- Write a short description with Summary, Why, and Validation sections, using conversation context when available.
+- Pass the generated title and body to `gh pr create --body-file` or `glab mr create --description` instead of relying only on autofill.
 - Avoid installing CLIs, authenticating, committing, or pushing without appropriate user intent.

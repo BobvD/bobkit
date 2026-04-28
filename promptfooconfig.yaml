@@ -31,3 +31,11 @@ tests:
         value: install
       - type: contains
         value: auth login
+      - type: contains
+        value: "type(scope): summary"
+      - type: contains
+        value: Summary, Why, and Validation
+      - type: contains
+        value: conversation context
+      - type: contains
+        value: --body-file
