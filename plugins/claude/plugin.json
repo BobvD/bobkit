@@ -1,0 +1,19 @@
+{
+  "name": "bobkit",
+  "description": "Bobkit Claude Code plugin spike with Rulesync-managed skills and Promptfoo evals.",
+  "version": "0.0.1",
+  "author": {
+    "name": "Bob van Donselaar",
+    "email": "bobvandonselaar@gmail.com"
+  },
+  "homepage": "https://github.com/BobvD/bobkit",
+  "repository": "https://github.com/BobvD/bobkit",
+  "license": "MIT",
+  "keywords": [
+    "bobkit",
+    "claude-code",
+    "skills",
+    "rulesync",
+    "promptfoo"
+  ]
+}

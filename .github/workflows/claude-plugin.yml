@@ -1,0 +1,36 @@
+name: Claude Plugin
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build Claude plugin artifact
+        run: npm run build:claude
+
+      - name: Check generated Claude skills
+        run: npm run rulesync:check
+
+      - name: Run Promptfoo evals
+        run: npm run eval
+
+      - name: Upload Claude plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bobkit-claude-plugin
+          path: dist/claude-plugin

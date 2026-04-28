@@ -1,0 +1,19 @@
+description: Bobkit vegetable-joke skill smoke eval
+
+prompts:
+  - file://evals/prompts/vegetable-joke.txt
+
+providers:
+  - echo
+
+tests:
+  - description: Vegetable joke contract includes the expected joke
+    vars:
+      request: Tell me a joke about vegetables.
+    assert:
+      - type: contains
+        value: Why did the lettuce start a band?
+      - type: contains
+        value: great beet
+      - type: contains
+        value: romaine friends
