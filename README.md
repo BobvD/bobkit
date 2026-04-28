@@ -8,7 +8,7 @@ Tiny Bobkit spike: one Rulesync-managed Claude skill, one Promptfoo eval, and a 
 - `rulesync.jsonc` tells Rulesync to generate a Claude Code project skill.
 - Generated skill copies are ignored; `.rulesync/` is the committed source of truth.
 - `promptfooconfig.yaml` checks the vegetable joke prompt contract with Promptfoo's offline `echo` provider.
-- `plugins/claude/plugin.json` is the source manifest for the Claude plugin artifact.
+- `plugins/claude/plugin.json` is the source manifest for the Claude plugin artifact and points Claude at generated `.claude/skills`.
 - `plugins/claude/marketplace.json` is the source manifest for the Bobkit Claude marketplace.
 - `.github/workflows/claude-plugin.yml` builds the deployable Claude plugin and marketplace artifacts in CI.
 
@@ -46,7 +46,7 @@ That creates a standalone plugin artifact at:
 ```text
 dist/claude-plugin/
   .claude-plugin/plugin.json
-  skills/vegetable-joke/SKILL.md
+  .claude/skills/vegetable-joke/SKILL.md
 ```
 
 It also creates a local Claude marketplace artifact at:
@@ -56,7 +56,7 @@ dist/claude-marketplace/
   .claude-plugin/marketplace.json
   plugins/bobkit/
     .claude-plugin/plugin.json
-    skills/vegetable-joke/SKILL.md
+    .claude/skills/vegetable-joke/SKILL.md
 ```
 
 Test the marketplace locally in Claude Code:

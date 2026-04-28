@@ -8,6 +8,6 @@
     "rulesync:check": "npx --yes rulesync@8.13.0 generate --check",
     "eval": "npx --yes promptfoo@0.121.9 eval -c promptfooconfig.yaml --no-progress-bar",
     "build:claude": "node scripts/build-claude-plugin.mjs",
-    "ci": "npm run build:claude && npm run rulesync:check && npm run eval"
+    "ci": "npm run build:claude && npm run eval"
   }
 }

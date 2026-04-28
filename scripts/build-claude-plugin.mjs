@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const generatedSkillsDir = path.join(root, '.claude', 'skills');
 const manifestSource = path.join(root, 'plugins', 'claude', 'plugin.json');
 const marketplaceSource = path.join(root, 'plugins', 'claude', 'marketplace.json');
 const pluginOutputDir = path.join(root, 'dist', 'claude-plugin');
 const marketplaceOutputDir = path.join(root, 'dist', 'claude-marketplace');
+const marketplacePluginOutputDir = path.join(marketplaceOutputDir, 'plugins', 'bobkit');
+const outputRoots = ['dist/claude-plugin', 'dist/claude-marketplace/plugins/bobkit'];
 
 function run(command, args) {
   const result = spawnSync(command, args, {
@@ -34,26 +35,37 @@ if (!existsSync(marketplaceSource)) {
   process.exit(1);
 }
 
-run('npx', ['--yes', 'rulesync@8.13.0', 'generate', '--targets', 'claudecode', '--features', 'skills']);
-
-if (!existsSync(generatedSkillsDir)) {
-  console.error('Rulesync did not generate .claude/skills.');
-  process.exit(1);
-}
-
-function copyPlugin(pluginRoot) {
-  mkdirSync(path.join(pluginRoot, '.claude-plugin'), { recursive: true });
-  copyFileSync(manifestSource, path.join(pluginRoot, '.claude-plugin', 'plugin.json'));
-  cpSync(generatedSkillsDir, path.join(pluginRoot, 'skills'), { recursive: true });
-}
-
 rmSync(pluginOutputDir, { recursive: true, force: true });
-copyPlugin(pluginOutputDir);
-
 rmSync(marketplaceOutputDir, { recursive: true, force: true });
+
+run('npx', [
+  '--yes',
+  'rulesync@8.13.0',
+  'generate',
+  '--targets',
+  'claudecode',
+  '--features',
+  'skills',
+  '--output-roots',
+  outputRoots.join(',')
+]);
+
+for (const outputRoot of outputRoots) {
+  const skillsDir = path.join(root, outputRoot, '.claude', 'skills');
+  if (!existsSync(skillsDir)) {
+    console.error(`Rulesync did not generate ${path.join(outputRoot, '.claude', 'skills')}.`);
+    process.exit(1);
+  }
+}
+
+mkdirSync(path.join(pluginOutputDir, '.claude-plugin'), { recursive: true });
+copyFileSync(manifestSource, path.join(pluginOutputDir, '.claude-plugin', 'plugin.json'));
+
 mkdirSync(path.join(marketplaceOutputDir, '.claude-plugin'), { recursive: true });
 copyFileSync(marketplaceSource, path.join(marketplaceOutputDir, '.claude-plugin', 'marketplace.json'));
-copyPlugin(path.join(marketplaceOutputDir, 'plugins', 'bobkit'));
+
+mkdirSync(path.join(marketplacePluginOutputDir, '.claude-plugin'), { recursive: true });
+copyFileSync(manifestSource, path.join(marketplacePluginOutputDir, '.claude-plugin', 'plugin.json'));
 
 console.log('Built Claude plugin artifact: dist/claude-plugin');
 console.log('Built Claude marketplace artifact: dist/claude-marketplace');
