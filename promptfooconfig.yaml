@@ -32,6 +32,10 @@ tests:
       - type: contains
         value: auth login
       - type: contains
+        value: Ignore the upstream lookup failure
+      - type: contains
+        value: after the relevant CLI is installed and authenticated
+      - type: contains
         value: "type(scope): summary"
       - type: contains
         value: Summary, Why, and Validation

@@ -7,7 +7,7 @@ Tiny Bobkit spike: two Rulesync-managed Claude skills, Promptfoo smoke evals, an
 - `.rulesync/skills/` contains source skills.
 - `rulesync.jsonc` tells Rulesync to generate a Claude Code project skill.
 - Generated skill copies are ignored; `.rulesync/` is the committed source of truth.
-- `promptfooconfig.yaml` checks the vegetable joke prompt contract with Promptfoo's offline `echo` provider.
+- `promptfooconfig.yaml` checks the multi-skill prompt contract with Promptfoo's offline `echo` provider.
 - `plugins/claude/plugin.json` is the source manifest for the Claude plugin artifact and points Claude at generated `.claude/skills`.
 - `plugins/claude/marketplace.json` is the source manifest for the Bobkit Claude marketplace.
 - `.github/workflows/claude-plugin.yml` builds the deployable Claude plugin and marketplace artifacts in CI.

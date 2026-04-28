@@ -17,19 +17,23 @@ Create a merge request or pull request for the current git repository. Prefer do
 1. Confirm this is a git repository:
    - Run `git rev-parse --show-toplevel`.
    - If it fails, stop and tell the user this command only works inside a git repo.
-2. Identify the remote host:
+2. Identify the remote host from git metadata first:
    - Read remotes with `git remote -v`.
    - If a remote URL contains `github.com`, use GitHub.
    - If a remote URL contains `gitlab.com`, use GitLab.
-   - If both are present, prefer the branch's upstream remote from `git rev-parse --abbrev-ref --symbolic-full-name @{u}`. If still ambiguous, ask the user which host to use.
-   - If the host is self-hosted or ambiguous, try the available authenticated CLI first: `gh repo view` for GitHub or `glab repo view` for GitLab. If neither identifies the repo, ask the user whether this repo is GitHub or GitLab.
-3. Check the required CLI:
-   - For GitHub, require `gh`.
-   - For GitLab, require `glab`.
+   - If both are present, try to prefer the branch's upstream remote with `git rev-parse --abbrev-ref --symbolic-full-name @{u}`.
+   - If the upstream command fails because no upstream is set, ignore that failure and continue with the remaining signals.
+   - If both are present and still ambiguous after checking the upstream remote, ask the user which host to use.
+   - If the host is self-hosted or ambiguous, do not run provider CLIs yet. Continue to the CLI checks below, then use authenticated CLI repo detection only after confirming the relevant CLI exists.
+3. Check the required CLI before any CLI-based host detection:
+   - For known GitHub repos, require `gh`.
+   - For known GitLab repos, require `glab`.
+   - For ambiguous repos, check both `gh` and `glab` availability before trying either provider's repo detection.
    - Check installation with `command -v gh` or `command -v glab`.
    - If the CLI is missing, stop and ask the user to install it. Suggest `brew install gh` or `brew install glab` on macOS, and mention the official package manager docs for other systems.
    - Check authentication with `gh auth status` or `glab auth status`.
    - If the CLI exists but auth is not configured, stop and ask the user to run `gh auth login` or `glab auth login`.
+   - For ambiguous repos only, after installation and auth checks pass, try `gh repo view` or `glab repo view`. If neither authenticated CLI identifies the repo, ask the user whether this repo is GitHub or GitLab.
 4. Inspect the branch and local state:
    - Run `git branch --show-current`.
    - If on `main`, `master`, or another protected/default branch, ask the user to create or switch to a feature branch first.
