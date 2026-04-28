@@ -1,0 +1,95 @@
+name: Claude Plugin
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build Claude plugin artifact
+        run: npm run build:claude
+
+      - name: Check generated Claude artifacts
+        run: |
+          test -f dist/claude-plugin/.claude-plugin/plugin.json
+          test -f dist/claude-plugin/.claude/skills/vegetable-joke/SKILL.md
+          test -f dist/claude-marketplace/.claude-plugin/marketplace.json
+          test -f dist/claude-marketplace/plugins/bobkit/.claude-plugin/plugin.json
+          test -f dist/claude-marketplace/plugins/bobkit/.claude/skills/vegetable-joke/SKILL.md
+
+      - name: Run Promptfoo evals
+        run: npm run eval
+
+      - name: Upload Claude plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bobkit-claude-plugin
+          path: dist/claude-plugin
+          if-no-files-found: error
+          include-hidden-files: true
+
+      - name: Upload Claude marketplace artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bobkit-claude-marketplace
+          path: dist/claude-marketplace
+          if-no-files-found: error
+          include-hidden-files: true
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build Claude marketplace artifact
+        run: npm run build:claude
+
+      - name: Publish Claude marketplace branch
+        env:
+          DEPLOY_BRANCH: claude-marketplace
+        run: |
+          set -euo pipefail
+
+          publish_dir="$(mktemp -d)"
+          cp -R dist/claude-marketplace/. "$publish_dir/"
+          touch "$publish_dir/.nojekyll"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch --orphan "$DEPLOY_BRANCH"
+          git rm -rf --cached . || true
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R "$publish_dir"/. .
+          git add -A
+          git commit -m "Deploy Claude marketplace"
+          git push --force origin "$DEPLOY_BRANCH"
