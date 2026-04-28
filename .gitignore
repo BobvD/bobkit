@@ -1,5 +1,6 @@
-# Rulesync-generated Claude skill outputs.
+# Rulesync-generated skill outputs.
 .claude/
+.codex/
 
 # Build artifacts.
 dist/
