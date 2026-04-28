@@ -1,0 +1,13 @@
+- description: Bobkit activates planning for feature requests
+  vars:
+    prompt: "I want to add a new workflow feature."
+  assert:
+    - type: contains
+      value: "spec-first-development"
+
+- description: Bobkit activates debugging for failures
+  vars:
+    prompt: "The test is failing and I do not know why."
+  assert:
+    - type: contains
+      value: "systematic-debugging"

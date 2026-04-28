@@ -1,0 +1,10 @@
+{
+  "id": "copilot",
+  "displayName": "GitHub Copilot",
+  "supportLevel": "instructions-and-skills",
+  "outputs": [
+    ".github/copilot-instructions.md",
+    ".github/skills"
+  ],
+  "notes": "GitHub Copilot supports repository instructions and project skills. V0 emits both."
+}

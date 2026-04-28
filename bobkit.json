@@ -1,0 +1,73 @@
+{
+  "id": "bobkit",
+  "name": "Bobkit",
+  "version": "0.1.0",
+  "description": "Portable workflow kit for AI coding agents.",
+  "skillsDir": "skills",
+  "workflowsDir": "workflows",
+  "agentsDir": "agents",
+  "templatesDir": "templates",
+  "requiredSkills": [
+    "using-bobkit",
+    "spec-first-development",
+    "writing-plans",
+    "executing-tasks",
+    "test-driven-development",
+    "verification-gate",
+    "code-review",
+    "systematic-debugging"
+  ],
+  "adapters": [
+    {
+      "id": "claude",
+      "displayName": "Claude Code",
+      "supportLevel": "native-plugin",
+      "outputPaths": [
+        ".claude-plugin/plugin.json"
+      ]
+    },
+    {
+      "id": "codex",
+      "displayName": "OpenAI Codex",
+      "supportLevel": "native-plugin",
+      "outputPaths": [
+        ".codex-plugin/plugin.json"
+      ]
+    },
+    {
+      "id": "gemini",
+      "displayName": "Gemini CLI",
+      "supportLevel": "native-extension",
+      "outputPaths": [
+        "gemini-extension.json"
+      ]
+    },
+    {
+      "id": "opencode",
+      "displayName": "OpenCode",
+      "supportLevel": "native-plugin",
+      "outputPaths": [
+        ".opencode/plugins/bobkit.js"
+      ]
+    },
+    {
+      "id": "cursor",
+      "displayName": "Cursor",
+      "supportLevel": "rules-and-commands",
+      "outputPaths": [
+        ".cursor/rules/bobkit.mdc",
+        ".cursor/commands/bobkit-plan.md",
+        ".cursor/commands/bobkit-verify.md"
+      ]
+    },
+    {
+      "id": "copilot",
+      "displayName": "GitHub Copilot",
+      "supportLevel": "instructions-and-skills",
+      "outputPaths": [
+        ".github/copilot-instructions.md",
+        ".github/skills"
+      ]
+    }
+  ]
+}

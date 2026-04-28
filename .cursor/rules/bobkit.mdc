@@ -1,0 +1,19 @@
+---
+description: Bobkit portable workflow discipline for planning, implementation, debugging, review, and verification.
+globs: "**/*"
+alwaysApply: true
+---
+
+# Bobkit
+
+You are working in a repository that uses Bobkit.
+
+Before coding, debugging, reviewing, or declaring completion:
+
+1. Read and follow the relevant Bobkit skill from `skills/`.
+2. Start with `skills/using-bobkit/SKILL.md` when unsure.
+3. Use spec-first planning for new features.
+4. Use systematic debugging for failures.
+5. Use the verification gate before completion.
+
+Do not treat this rule as a replacement for project instructions. Project and user instructions remain higher priority.

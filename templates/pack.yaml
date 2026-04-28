@@ -1,0 +1,17 @@
+# Bobkit project pack template
+id: example-pack
+name: Example Pack
+version: 0.1.0
+description: Project-specific Bobkit overlay.
+
+skills:
+  add: []
+  override: []
+
+workflows:
+  add: []
+  override: []
+
+guardrails:
+  add: []
+  override: []

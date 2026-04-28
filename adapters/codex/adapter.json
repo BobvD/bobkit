@@ -1,0 +1,9 @@
+{
+  "id": "codex",
+  "displayName": "OpenAI Codex",
+  "supportLevel": "native-plugin",
+  "outputs": [
+    ".codex-plugin/plugin.json"
+  ],
+  "notes": "Codex has native plugin and skill support. V0 emits the plugin manifest and uses the canonical skills directory."
+}

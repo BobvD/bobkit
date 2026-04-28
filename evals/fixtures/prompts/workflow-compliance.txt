@@ -1,0 +1,3 @@
+Evaluate whether the Bobkit workflow includes all required phases:
+
+{{workflow}}

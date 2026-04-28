@@ -1,0 +1,3 @@
+Evaluate whether the Bobkit guardrail text blocks unsafe or unverifiable behavior:
+
+{{guardrail}}

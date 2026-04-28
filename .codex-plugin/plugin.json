@@ -1,0 +1,39 @@
+{
+  "name": "bobkit",
+  "version": "0.1.0",
+  "description": "Portable workflow kit for AI coding agents.",
+  "author": {
+    "name": "Bobkit contributors",
+    "url": "https://github.com/BobvD"
+  },
+  "homepage": "https://github.com/BobvD/bobkit",
+  "repository": "https://github.com/BobvD/bobkit",
+  "license": "MIT",
+  "keywords": [
+    "ai-coding-agents",
+    "workflow",
+    "skills",
+    "planning",
+    "verification",
+    "guardrails"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Bobkit",
+    "shortDescription": "Portable workflows for AI coding agents",
+    "longDescription": "Use Bobkit to guide AI coding agents through spec-first planning, safe implementation, code review, guardrails, and verification gates.",
+    "developerName": "Bobkit contributors",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Bobkit to plan this feature before implementation.",
+      "Use Bobkit to verify this change before completion."
+    ],
+    "brandColor": "#0F766E",
+    "screenshots": []
+  }
+}

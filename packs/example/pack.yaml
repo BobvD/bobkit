@@ -1,0 +1,17 @@
+# Example Bobkit project pack
+id: example
+name: Example Pack
+version: 0.1.0
+description: Demonstrates how project packs will extend Bobkit without changing core.
+
+skills:
+  add: []
+  override: []
+
+workflows:
+  add: []
+  override: []
+
+guardrails:
+  add: []
+  override: []

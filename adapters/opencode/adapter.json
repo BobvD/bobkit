@@ -1,0 +1,9 @@
+{
+  "id": "opencode",
+  "displayName": "OpenCode",
+  "supportLevel": "native-plugin",
+  "outputs": [
+    ".opencode/plugins/bobkit.js"
+  ],
+  "notes": "OpenCode plugins can register skill paths and inject bootstrap context. V0 emits a small JavaScript plugin."
+}

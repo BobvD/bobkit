@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bobkit V0 Config",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "description",
+    "skillsDir",
+    "workflowsDir",
+    "agentsDir",
+    "templatesDir",
+    "adapters"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "skillsDir": { "type": "string" },
+    "workflowsDir": { "type": "string" },
+    "agentsDir": { "type": "string" },
+    "templatesDir": { "type": "string" },
+    "adapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "displayName", "supportLevel", "outputPaths"]
+      }
+    }
+  }
+}

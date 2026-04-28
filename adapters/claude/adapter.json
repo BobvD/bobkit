@@ -1,0 +1,9 @@
+{
+  "id": "claude",
+  "displayName": "Claude Code",
+  "supportLevel": "native-plugin",
+  "outputs": [
+    ".claude-plugin/plugin.json"
+  ],
+  "notes": "Claude Code has native plugin, skill, agent, command, and hook surfaces. V0 emits the plugin manifest and uses the canonical skills directory."
+}

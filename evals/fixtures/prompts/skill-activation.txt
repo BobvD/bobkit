@@ -1,0 +1,5 @@
+You are evaluating whether Bobkit chooses the right skill for this request:
+
+{{prompt}}
+
+Return only the Bobkit skill name that should activate first.

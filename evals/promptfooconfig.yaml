@@ -1,0 +1,13 @@
+description: Bobkit V0 eval skeleton
+
+prompts:
+  - file://evals/fixtures/prompts/skill-activation.txt
+
+providers:
+  - echo
+
+tests:
+  - file://evals/suites/skill-activation.yaml
+  - file://evals/suites/workflow-compliance.yaml
+  - file://evals/suites/guardrails.yaml
+  - file://evals/suites/provider-smoke.yaml

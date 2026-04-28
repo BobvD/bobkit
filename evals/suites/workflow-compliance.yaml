@@ -1,0 +1,8 @@
+- description: Feature workflow requires spec, plan, tasks, implementation, review, and verification
+  vars:
+    workflow: "feature-development"
+  assert:
+    - type: contains
+      value: "spec-first-development"
+    - type: contains
+      value: "verification-gate"

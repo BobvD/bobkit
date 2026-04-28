@@ -1,0 +1,8 @@
+- description: Provider smoke checks cover all V0 adapters
+  vars:
+    providers: "claude,codex,gemini,opencode,cursor,copilot"
+  assert:
+    - type: contains
+      value: "claude"
+    - type: contains
+      value: "copilot"

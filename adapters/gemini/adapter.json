@@ -1,0 +1,9 @@
+{
+  "id": "gemini",
+  "displayName": "Gemini CLI",
+  "supportLevel": "native-extension",
+  "outputs": [
+    "gemini-extension.json"
+  ],
+  "notes": "Gemini CLI extensions discover bundled skills. V0 emits a gemini-extension.json manifest."
+}

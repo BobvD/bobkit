@@ -1,0 +1,21 @@
+{
+  "name": "bobkit",
+  "version": "0.1.0",
+  "description": "Portable workflow kit for AI coding agents.",
+  "author": {
+    "name": "Bobkit contributors"
+  },
+  "homepage": "https://github.com/BobvD/bobkit",
+  "repository": "https://github.com/BobvD/bobkit",
+  "license": "MIT",
+  "keywords": [
+    "ai-coding-agents",
+    "workflow",
+    "skills",
+    "planning",
+    "verification",
+    "guardrails"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

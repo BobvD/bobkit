@@ -1,0 +1,11 @@
+{
+  "id": "cursor",
+  "displayName": "Cursor",
+  "supportLevel": "rules-and-commands",
+  "outputs": [
+    ".cursor/rules/bobkit.mdc",
+    ".cursor/commands/bobkit-plan.md",
+    ".cursor/commands/bobkit-verify.md"
+  ],
+  "notes": "Cursor support is rules and commands first. Native plugin behavior is intentionally not assumed in V0."
+}
