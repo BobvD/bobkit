@@ -1,10 +1,10 @@
 # Bobkit
 
-Tiny Bobkit spike: one Rulesync-managed Claude skill, one Promptfoo eval, and a Claude marketplace build pipeline.
+Tiny Bobkit spike: two Rulesync-managed Claude skills, Promptfoo smoke evals, and a Claude marketplace build pipeline.
 
 ## What This Contains
 
-- `.rulesync/skills/vegetable-joke/SKILL.md` is the source skill.
+- `.rulesync/skills/` contains source skills.
 - `rulesync.jsonc` tells Rulesync to generate a Claude Code project skill.
 - Generated skill copies are ignored; `.rulesync/` is the committed source of truth.
 - `promptfooconfig.yaml` checks the vegetable joke prompt contract with Promptfoo's offline `echo` provider.
@@ -26,6 +26,7 @@ npm run eval
 That generates:
 
 ```text
+.claude/skills/create-mr/SKILL.md
 .claude/skills/vegetable-joke/SKILL.md
 ```
 
@@ -46,6 +47,7 @@ That creates a standalone plugin artifact at:
 ```text
 dist/claude-plugin/
   .claude-plugin/plugin.json
+  .claude/skills/create-mr/SKILL.md
   .claude/skills/vegetable-joke/SKILL.md
 ```
 
@@ -56,6 +58,7 @@ dist/claude-marketplace/
   .claude-plugin/marketplace.json
   plugins/bobkit/
     .claude-plugin/plugin.json
+    .claude/skills/create-mr/SKILL.md
     .claude/skills/vegetable-joke/SKILL.md
 ```
 
@@ -65,6 +68,7 @@ Test the marketplace locally in Claude Code:
 /plugin marketplace add ./dist/claude-marketplace
 /plugin install bobkit@bobkit-marketplace
 /reload-plugins
+/bobkit:create-mr
 /bobkit:vegetable-joke
 ```
 

@@ -1,0 +1,11 @@
+User request: {{request}}
+
+The vegetable-joke skill should answer with:
+Why did the lettuce start a band? Because it had a great beet and wanted everyone to romaine friends.
+
+The create-mr skill should:
+- Identify whether the current repository is hosted on GitHub or GitLab from git remotes.
+- Use `gh` for GitHub pull requests and `glab` for GitLab merge requests.
+- Ask the user to install `gh` or `glab` when the required CLI is missing.
+- Ask the user to authenticate with `gh auth login` or `glab auth login` when the CLI is not configured.
+- Avoid installing CLIs, authenticating, committing, or pushing without appropriate user intent.

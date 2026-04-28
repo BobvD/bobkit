@@ -1,4 +1,0 @@
-User request: {{request}}
-
-The vegetable-joke skill should answer with:
-Why did the lettuce start a band? Because it had a great beet and wanted everyone to romaine friends.

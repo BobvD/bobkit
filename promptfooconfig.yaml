@@ -1,7 +1,7 @@
-description: Bobkit vegetable-joke skill smoke eval
+description: Bobkit skill smoke evals
 
 prompts:
-  - file://evals/prompts/vegetable-joke.txt
+  - file://evals/prompts/skill-contracts.txt
 
 providers:
   - echo
@@ -17,3 +17,17 @@ tests:
         value: great beet
       - type: contains
         value: romaine friends
+  - description: Create MR contract includes host detection and CLI fallback
+    vars:
+      request: /create-mr
+    assert:
+      - type: contains
+        value: GitHub or GitLab
+      - type: contains
+        value: gh
+      - type: contains
+        value: glab
+      - type: contains
+        value: install
+      - type: contains
+        value: auth login
