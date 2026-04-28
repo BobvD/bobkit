@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const generatedSkillsDir = path.join(root, '.claude', 'skills');
 const manifestSource = path.join(root, 'plugins', 'claude', 'plugin.json');
-const outputDir = path.join(root, 'dist', 'claude-plugin');
+const marketplaceSource = path.join(root, 'plugins', 'claude', 'marketplace.json');
+const pluginOutputDir = path.join(root, 'dist', 'claude-plugin');
+const marketplaceOutputDir = path.join(root, 'dist', 'claude-marketplace');
 
 function run(command, args) {
   const result = spawnSync(command, args, {
@@ -27,6 +29,11 @@ if (!existsSync(manifestSource)) {
   process.exit(1);
 }
 
+if (!existsSync(marketplaceSource)) {
+  console.error('Missing Claude marketplace source: plugins/claude/marketplace.json');
+  process.exit(1);
+}
+
 run('npx', ['--yes', 'rulesync@8.13.0', 'generate', '--targets', 'claudecode', '--features', 'skills']);
 
 if (!existsSync(generatedSkillsDir)) {
@@ -34,9 +41,19 @@ if (!existsSync(generatedSkillsDir)) {
   process.exit(1);
 }
 
-rmSync(outputDir, { recursive: true, force: true });
-mkdirSync(path.join(outputDir, '.claude-plugin'), { recursive: true });
-copyFileSync(manifestSource, path.join(outputDir, '.claude-plugin', 'plugin.json'));
-cpSync(generatedSkillsDir, path.join(outputDir, 'skills'), { recursive: true });
+function copyPlugin(pluginRoot) {
+  mkdirSync(path.join(pluginRoot, '.claude-plugin'), { recursive: true });
+  copyFileSync(manifestSource, path.join(pluginRoot, '.claude-plugin', 'plugin.json'));
+  cpSync(generatedSkillsDir, path.join(pluginRoot, 'skills'), { recursive: true });
+}
+
+rmSync(pluginOutputDir, { recursive: true, force: true });
+copyPlugin(pluginOutputDir);
+
+rmSync(marketplaceOutputDir, { recursive: true, force: true });
+mkdirSync(path.join(marketplaceOutputDir, '.claude-plugin'), { recursive: true });
+copyFileSync(marketplaceSource, path.join(marketplaceOutputDir, '.claude-plugin', 'marketplace.json'));
+copyPlugin(path.join(marketplaceOutputDir, 'plugins', 'bobkit'));
 
 console.log('Built Claude plugin artifact: dist/claude-plugin');
+console.log('Built Claude marketplace artifact: dist/claude-marketplace');

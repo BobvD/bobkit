@@ -1,6 +1,6 @@
-# bobkit
+# Bobkit
 
-Tiny Bobkit spike: one Rulesync-managed Claude skill, one Promptfoo eval, and a Claude plugin build pipeline.
+Tiny Bobkit spike: one Rulesync-managed Claude skill, one Promptfoo eval, and a Claude marketplace build pipeline.
 
 ## What This Contains
 
@@ -9,7 +9,8 @@ Tiny Bobkit spike: one Rulesync-managed Claude skill, one Promptfoo eval, and a 
 - Generated skill copies are ignored; `.rulesync/` is the committed source of truth.
 - `promptfooconfig.yaml` checks the vegetable joke prompt contract with Promptfoo's offline `echo` provider.
 - `plugins/claude/plugin.json` is the source manifest for the Claude plugin artifact.
-- `.github/workflows/claude-plugin.yml` builds the deployable Claude plugin artifact in CI.
+- `plugins/claude/marketplace.json` is the source manifest for the Bobkit Claude marketplace.
+- `.github/workflows/claude-plugin.yml` builds the deployable Claude plugin and marketplace artifacts in CI.
 
 ## Optional RTK
 
@@ -40,7 +41,7 @@ npm run rulesync:check
 npm run build:claude
 ```
 
-That creates a deployable artifact at:
+That creates a standalone plugin artifact at:
 
 ```text
 dist/claude-plugin/
@@ -48,4 +49,30 @@ dist/claude-plugin/
   skills/vegetable-joke/SKILL.md
 ```
 
-`dist/` and `.claude/` are generated and ignored. CI runs the same build and uploads `dist/claude-plugin` as an artifact.
+It also creates a local Claude marketplace artifact at:
+
+```text
+dist/claude-marketplace/
+  .claude-plugin/marketplace.json
+  plugins/bobkit/
+    .claude-plugin/plugin.json
+    skills/vegetable-joke/SKILL.md
+```
+
+Test the marketplace locally in Claude Code:
+
+```text
+/plugin marketplace add ./dist/claude-marketplace
+/plugin install bobkit@bobkit-marketplace
+/reload-plugins
+/bobkit:vegetable-joke
+```
+
+On pushes to `main`, CI publishes the generated marketplace to the `claude-marketplace` branch. After that branch exists, install it from another project with:
+
+```bash
+claude plugin marketplace add BobvD/bobkit@claude-marketplace --scope project
+claude plugin install bobkit@bobkit-marketplace --scope project
+```
+
+`dist/` and `.claude/` are generated and ignored. CI runs the same build, uploads both artifacts, and deploys the marketplace branch from generated output rather than committing generated skills to `main`.
