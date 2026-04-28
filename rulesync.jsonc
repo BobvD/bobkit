@@ -1,6 +1,6 @@
 {
   "$schema": "https://github.com/dyoshikawa/rulesync/releases/latest/download/config-schema.json",
-  "targets": ["claudecode"],
+  "targets": ["claudecode", "codexcli"],
   "features": ["skills"],
   "outputRoots": ["."],
   "delete": true
