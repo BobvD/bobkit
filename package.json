@@ -37,6 +37,7 @@
     "install:local": "node bin/bobkit.mjs install",
     "update:local": "node bin/bobkit.mjs update",
     "build:package": "node scripts/build-package.mjs",
+    "release:check": "node scripts/verify-release-ready.mjs",
     "prepack": "npm run build:package",
     "rulesync:generate": "npx --yes rulesync@8.13.0 generate",
     "rulesync:check": "npx --yes rulesync@8.13.0 generate --check",

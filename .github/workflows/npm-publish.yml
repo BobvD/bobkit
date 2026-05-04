@@ -1,17 +1,98 @@
 name: npm Publish
 
 on:
+  pull_request:
+    paths:
+      - 'CHANGELOG.md'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'bin/**'
+      - '.rulesync/skills/**'
+      - 'scripts/**'
+      - '.github/workflows/npm-publish.yml'
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+    paths:
+      - 'CHANGELOG.md'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'bin/**'
+      - '.rulesync/skills/**'
+      - 'scripts/**'
+      - '.github/workflows/npm-publish.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
-  id-token: write
+
+concurrency:
+  group: npm-release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      tag_exists: ${{ steps.tag.outputs.exists }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Install package metadata
+        run: npm ci --ignore-scripts
+
+      - name: Read release version
+        id: version
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether release tag exists
+        id: tag
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify release metadata
+        run: npm run release:check
+
+      - name: Run CI
+        run: npm run ci
+
+      - name: Build npm package assets
+        run: npm run build:package
+
+      - name: Verify package contents
+        run: |
+          set -euo pipefail
+          npm pack --dry-run --json --ignore-scripts > pack.json
+          node scripts/verify-packed-package.mjs pack.json
+
   publish:
     runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.validate.outputs.tag_exists == 'false'
+    permissions:
+      contents: write
+      id-token: write
 
     steps:
       - name: Check out repository
@@ -26,46 +107,47 @@ jobs:
       - name: Install package metadata
         run: npm ci --ignore-scripts
 
-      - name: Verify tag matches package version
+      - name: Run release checks
         run: |
           set -euo pipefail
-          version="v$(node -p "require('./package.json').version")"
-          test "$version" = "${GITHUB_REF_NAME}"
-
-      - name: Run CI
-        run: npm run ci
-
-      - name: Build npm package assets
-        run: npm run build:package
-
-      - name: Verify package contents
-        run: |
-          set -euo pipefail
+          npm run release:check
+          npm run ci
+          npm run build:package
           npm pack --dry-run --json --ignore-scripts > pack.json
-          node <<'NODE'
-          const fs = require('node:fs');
-          const path = require('node:path');
-          const [{ files }] = JSON.parse(fs.readFileSync('pack.json', 'utf8'));
-          const names = new Set(files.map((file) => file.path));
-          const skills = fs.readdirSync('.rulesync/skills', { withFileTypes: true })
-            .filter((entry) => entry.isDirectory())
-            .filter((entry) => fs.existsSync(path.join('.rulesync/skills', entry.name, 'SKILL.md')))
-            .map((entry) => entry.name);
-          const required = [
-            'bin/bobkit.mjs',
-            'README.md',
-            'CHANGELOG.md',
-            ...skills.flatMap((skill) => [
-              `.codex/skills/${skill}/SKILL.md`,
-              `.claude/skills/${skill}/SKILL.md`,
-            ]),
-          ];
-          const missing = required.filter((file) => !names.has(file));
-          if (missing.length > 0) {
-            console.error(`Missing from npm package:\n${missing.join('\n')}`);
-            process.exit(1);
-          }
-          NODE
+          node scripts/verify-packed-package.mjs pack.json
+
+      - name: Check npm version
+        id: npm
+        env:
+          PACKAGE_VERSION: ${{ needs.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+          if npm view "bobkit@${PACKAGE_VERSION}" version >/tmp/npm-view.out 2>/tmp/npm-view.err; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "bobkit@${PACKAGE_VERSION} is already published."
+          elif grep -q 'E404' /tmp/npm-view.err; then
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            echo "bobkit@${PACKAGE_VERSION} is not published yet."
+          else
+            cat /tmp/npm-view.err
+            exit 1
+          fi
 
       - name: Publish to npm
+        if: steps.npm.outputs.published == 'false'
         run: npm publish --access public --provenance
+
+      - name: Create release notes
+        run: node scripts/extract-changelog-entry.mjs > release-notes.md
+
+      - name: Create GitHub release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.validate.outputs.tag }}
+          PACKAGE_VERSION: ${{ needs.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            --target "$GITHUB_SHA" \
+            --title "bobkit ${PACKAGE_VERSION}" \
+            --notes-file release-notes.md
