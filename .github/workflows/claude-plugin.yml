@@ -32,10 +32,12 @@ jobs:
         run: |
           test -f dist/claude-plugin/.claude-plugin/plugin.json
           test -f dist/claude-plugin/.claude/skills/create-mr/SKILL.md
+          test -f dist/claude-plugin/.claude/skills/feature-brainstorm/SKILL.md
           test -f dist/claude-plugin/.claude/skills/vegetable-joke/SKILL.md
           test -f dist/claude-marketplace/.claude-plugin/marketplace.json
           test -f dist/claude-marketplace/plugins/bobkit/.claude-plugin/plugin.json
           test -f dist/claude-marketplace/plugins/bobkit/.claude/skills/create-mr/SKILL.md
+          test -f dist/claude-marketplace/plugins/bobkit/.claude/skills/feature-brainstorm/SKILL.md
           test -f dist/claude-marketplace/plugins/bobkit/.claude/skills/vegetable-joke/SKILL.md
 
       - name: Run Promptfoo evals

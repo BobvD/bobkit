@@ -1,16 +1,6 @@
+Skill under test: {{skill_name}}
+
 User request: {{request}}
 
-The vegetable-joke skill should answer with:
-Why did the lettuce start a band? Because it had a great beet and wanted everyone to romaine friends.
-
-The create-mr skill should:
-- Identify whether the current repository is hosted on GitHub or GitLab from git remotes.
-- Ignore the upstream lookup failure when a branch has no upstream and continue with other host signals.
-- Use `gh` for GitHub pull requests and `glab` for GitLab merge requests.
-- Ask the user to install `gh` or `glab` when the required CLI is missing.
-- Ask the user to authenticate with `gh auth login` or `glab auth login` when the CLI is not configured.
-- Only use `gh repo view` or `glab repo view` after the relevant CLI is installed and authenticated.
-- Write a concise human-readable title using `[TICKET] type(scope): summary` or `type(scope): summary`.
-- Write a short description with Summary, Why, and Validation sections, using conversation context when available.
-- Pass the generated title and body to `gh pr create --body-file` or `glab mr create --description` instead of relying only on autofill.
-- Avoid installing CLIs, authenticating, committing, or pushing without appropriate user intent.
+Expected contract:
+{{expected_contract}}
