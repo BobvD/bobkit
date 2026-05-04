@@ -1,15 +1,42 @@
 {
   "name": "bobkit",
   "version": "0.0.1",
-  "private": true,
+  "description": "CLI for installing and updating Bobkit AI-agent skills across local agent runtimes.",
   "type": "module",
   "bin": {
     "bobkit": "./bin/bobkit.mjs"
   },
+  "files": [
+    "bin/",
+    ".codex/skills/",
+    ".claude/skills/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BobvD/bobkit.git"
+  },
+  "homepage": "https://github.com/BobvD/bobkit#readme",
+  "bugs": {
+    "url": "https://github.com/BobvD/bobkit/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agents",
+    "codex",
+    "claude-code",
+    "skills"
+  ],
   "scripts": {
     "bobkit": "node bin/bobkit.mjs",
     "install:local": "node bin/bobkit.mjs install",
     "update:local": "node bin/bobkit.mjs update",
+    "build:package": "node scripts/build-package.mjs",
+    "prepack": "npm run build:package",
     "rulesync:generate": "npx --yes rulesync@8.13.0 generate",
     "rulesync:check": "npx --yes rulesync@8.13.0 generate --check",
     "eval": "npx --yes promptfoo@0.121.9 eval -c promptfooconfig.yaml --no-progress-bar",

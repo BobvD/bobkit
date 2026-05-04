@@ -17,6 +17,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const home = os.homedir();
+const sourceSkillsDir = path.join(root, '.rulesync', 'skills');
+const packageJsonPath = path.join(root, 'package.json');
+const distribution = detectDistribution();
 
 const targets = {
   codex: {
@@ -72,6 +75,7 @@ function main() {
 
 function parseFlags(args) {
   const flags = {
+    dev: false,
     dryRun: false,
     force: false,
     replace: false,
@@ -79,7 +83,8 @@ function parseFlags(args) {
   };
 
   for (const arg of args) {
-    if (arg === '--dry-run') flags.dryRun = true;
+    if (arg === '--dev') flags.dev = true;
+    else if (arg === '--dry-run') flags.dryRun = true;
     else if (arg === '--force') flags.force = true;
     else if (arg === '--replace') flags.replace = true;
     else if (arg === '--codex-only') flags.targets = ['codex'];
@@ -91,11 +96,29 @@ function parseFlags(args) {
 }
 
 function install(flags) {
-  runRulesyncGenerate(flags);
+  if (shouldGenerate(flags)) {
+    runRulesyncGenerate(flags);
+  } else if (flags.dryRun) {
+    console.log('Would use bundled generated skills; Rulesync is not required.');
+  } else {
+    console.log('Using bundled generated skills; Rulesync is not required.');
+  }
+
   linkGeneratedSkills(flags);
 }
 
 function update(flags) {
+  if (!isDevMode(flags)) {
+    if (flags.dryRun) {
+      console.log('Would tell user to run: npm install -g bobkit@latest && bobkit install');
+      return;
+    }
+
+    console.log('Bobkit is installed as an npm package.');
+    console.log('Update with: npm install -g bobkit@latest && bobkit install');
+    return;
+  }
+
   ensureGitRepo();
   const trackedDirty = gitTrackedDirty();
 
@@ -113,9 +136,10 @@ function update(flags) {
 }
 
 function status() {
-  console.log(`Bobkit repo: ${root}`);
+  console.log(`Bobkit root: ${root}`);
+  console.log(`Mode: ${isDevMode({ dev: false }) ? 'dev checkout' : 'npm package'}`);
 
-  if (isGitRepo()) {
+  if (isDevMode({ dev: false }) && isGitRepo()) {
     const branch = runCapture('git', ['branch', '--show-current']) || '(detached)';
     const commit = runCapture('git', ['rev-parse', '--short', 'HEAD']);
     const upstream = runCapture('git', ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], {
@@ -127,7 +151,7 @@ function status() {
     console.log(`Upstream: ${upstream || '(none)'}`);
     console.log(`Worktree: ${dirty ? 'dirty' : 'clean'}`);
   } else {
-    console.log('Git: not a git repository');
+    console.log('Git: not used in npm package mode');
   }
 
   console.log('');
@@ -137,9 +161,11 @@ function status() {
 function doctor() {
   let failed = false;
 
-  failed = checkCommand('git') || failed;
   failed = checkCommand('node') || failed;
-  failed = checkCommand('npm') || failed;
+  if (isDevMode({ dev: false })) {
+    failed = checkCommand('git') || failed;
+    failed = checkCommand('npm') || failed;
+  }
 
   if (!existsSync(path.join(root, 'package.json'))) {
     failed = true;
@@ -171,7 +197,7 @@ function doctor() {
 }
 
 function listSkills() {
-  for (const skill of sourceSkills()) {
+  for (const skill of availableSkills()) {
     console.log(skill);
   }
 }
@@ -232,9 +258,9 @@ function linkSkill(source, destination, flags) {
 }
 
 function printSkillTable() {
-  const skills = sourceSkills();
+  const skills = availableSkills();
   if (skills.length === 0) {
-    console.log('No source skills found.');
+    console.log('No skills found.');
     return;
   }
 
@@ -245,8 +271,18 @@ function printSkillTable() {
   }
 }
 
-function sourceSkills() {
-  const dir = path.join(root, '.rulesync', 'skills');
+function availableSkills() {
+  if (isDevMode({ dev: false }) && existsSync(sourceSkillsDir)) {
+    return skillsInDirectory(sourceSkillsDir);
+  }
+
+  return [...new Set([
+    ...generatedSkills(targets.codex.generatedDir),
+    ...generatedSkills(targets.claude.generatedDir),
+  ])].sort();
+}
+
+function skillsInDirectory(dir) {
   if (!existsSync(dir)) return [];
 
   return readdirSync(dir, { withFileTypes: true })
@@ -257,6 +293,8 @@ function sourceSkills() {
 }
 
 function generatedSkills(dir) {
+  if (!existsSync(dir)) return [];
+
   return readdirSync(dir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .filter((entry) => existsSync(path.join(dir, entry.name, 'SKILL.md')))
@@ -325,6 +363,21 @@ function ensureGitRepo() {
   }
 }
 
+function shouldGenerate(flags) {
+  return isDevMode(flags);
+}
+
+function isDevMode(flags) {
+  return flags.dev || distribution === 'dev';
+}
+
+function detectDistribution() {
+  if (process.env.BOBKIT_DISTRIBUTION === 'npm') return 'npm';
+  if (process.env.BOBKIT_DISTRIBUTION === 'dev') return 'dev';
+  if (existsSync(sourceSkillsDir)) return 'dev';
+  return 'npm';
+}
+
 function isGitRepo() {
   return runCapture('git', ['rev-parse', '--is-inside-work-tree'], { allowFailure: true }) === 'true';
 }
@@ -379,20 +432,21 @@ function printHelp() {
   console.log(`bobkit
 
 Usage:
-  bobkit install [--replace] [--dry-run] [--codex-only|--claude-only]
-  bobkit update  [--force] [--replace] [--dry-run] [--codex-only|--claude-only]
+  bobkit install [--replace] [--dry-run] [--dev] [--codex-only|--claude-only]
+  bobkit update  [--force] [--replace] [--dry-run] [--dev] [--codex-only|--claude-only]
   bobkit status
   bobkit doctor
   bobkit list
 
 Commands:
-  install   Generate skills and symlink them into global Codex/Claude skill dirs.
-  update    Pull the Bobkit repo, regenerate skills, and refresh global symlinks.
+  install   Symlink bundled skills into global Codex/Claude skill dirs.
+  update    In npm mode, print the npm upgrade command. In dev mode, pull and refresh.
   status    Show repo revision and global skill link status.
   doctor    Check local prerequisites and broken global skill links.
-  list      List source skills.
+  list      List available skills.
 
 Options:
+  --dev          Force dev checkout behavior and run Rulesync before linking.
   --replace      Replace existing non-symlink skill directories during install/update.
   --force        Allow update when tracked local changes exist.
   --dry-run      Print actions without changing files or running git pull.
@@ -402,7 +456,7 @@ Options:
 }
 
 function printVersion() {
-  const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
   console.log(packageJson.version);
 }
 

@@ -1,0 +1,69 @@
+name: npm Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Install package metadata
+        run: npm ci --ignore-scripts
+
+      - name: Verify tag matches package version
+        run: |
+          set -euo pipefail
+          version="v$(node -p "require('./package.json').version")"
+          test "$version" = "${GITHUB_REF_NAME}"
+
+      - name: Run CI
+        run: npm run ci
+
+      - name: Build npm package assets
+        run: npm run build:package
+
+      - name: Verify package contents
+        run: |
+          set -euo pipefail
+          npm pack --dry-run --json --ignore-scripts > pack.json
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const [{ files }] = JSON.parse(fs.readFileSync('pack.json', 'utf8'));
+          const names = new Set(files.map((file) => file.path));
+          const skills = fs.readdirSync('.rulesync/skills', { withFileTypes: true })
+            .filter((entry) => entry.isDirectory())
+            .filter((entry) => fs.existsSync(path.join('.rulesync/skills', entry.name, 'SKILL.md')))
+            .map((entry) => entry.name);
+          const required = [
+            'bin/bobkit.mjs',
+            ...skills.flatMap((skill) => [
+              `.codex/skills/${skill}/SKILL.md`,
+              `.claude/skills/${skill}/SKILL.md`,
+            ]),
+          ];
+          const missing = required.filter((file) => !names.has(file));
+          if (missing.length > 0) {
+            console.error(`Missing from npm package:\n${missing.join('\n')}`);
+            process.exit(1);
+          }
+          NODE
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance

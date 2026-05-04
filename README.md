@@ -32,26 +32,26 @@ Today it carries three skills: `vegetable-joke`, `create-mr`, and `feature-brain
 
 | Task | Command |
 | --- | --- |
-| Use the Bobkit CLI from this checkout | `npm link` |
+| Install Bobkit globally | `npm install -g bobkit` |
 | Install generated skills globally | `bobkit install` |
-| Update Bobkit and refresh global skills | `bobkit update` |
+| Update Bobkit and refresh global skills | `npm install -g bobkit@latest && bobkit install` |
 | Generate skills for all targets | `npm run rulesync:generate` |
 | Check generated output is fresh | `npm run rulesync:check` |
 | Run prompt evals | `npm run eval` |
 | Build plugin + marketplace artifacts | `npm run build:claude` |
+| Build npm package assets | `npm run build:package` |
 | What CI runs | `npm run ci` |
 
 ## Bobkit CLI
 
-The local CLI manages Bobkit skills across projects on this machine. Install it once from this checkout:
+The CLI manages Bobkit skills across projects on this machine. Normal users install it from npm:
 
 ```bash
-cd ~/Documents/bobkit
-npm link
+npm install -g bobkit
 bobkit install
 ```
 
-`bobkit install` regenerates Rulesync outputs and symlinks generated skills into:
+The npm package includes pre-generated Codex and Claude skills. `bobkit install` symlinks those bundled skills into:
 
 - `~/.codex/skills`
 - `~/.claude/skills`
@@ -59,14 +59,39 @@ bobkit install
 Useful commands:
 
 ```bash
-bobkit list       # list source skills
-bobkit status     # show repo revision and global link state
+bobkit list       # list available skills
+bobkit status     # show package mode and global link state
 bobkit doctor     # check prerequisites and broken links
-bobkit install    # regenerate and refresh global symlinks
-bobkit update     # git pull --ff-only, regenerate, refresh symlinks
+bobkit install    # refresh global symlinks from bundled skills
+bobkit update     # print the npm upgrade command
+```
+
+For contributors working from a checkout:
+
+```bash
+cd ~/Documents/bobkit
+npm link
+bobkit install --dev
+```
+
+In dev checkout mode, Bobkit can regenerate Rulesync outputs before linking:
+
+```bash
+bobkit install --dev
+bobkit update --dev
 ```
 
 If a skill already exists as a normal directory, Bobkit will not overwrite it by default. Use `bobkit install --replace` once when you want Bobkit to adopt those existing local copies as symlinks.
+
+## Publishing To npm
+
+The package name is `bobkit`. Release flow:
+
+1. Make sure the package version in `package.json` is the version you want.
+2. Push a tag matching that version, for example `v0.1.0`.
+3. The `npm Publish` workflow runs CI, builds package assets, verifies `npm pack --dry-run`, and publishes with npm Trusted Publishing.
+
+One-time npm setup is required before the first release: configure npm Trusted Publishing for `BobvD/bobkit` and `.github/workflows/npm-publish.yml`.
 
 ## Optional RTK
 
