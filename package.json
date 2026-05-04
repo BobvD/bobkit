@@ -4,7 +4,7 @@
   "description": "CLI for installing and updating Bobkit AI-agent skills across local agent runtimes.",
   "type": "module",
   "bin": {
-    "bobkit": "./bin/bobkit.mjs"
+    "bobkit": "bin/bobkit.mjs"
   },
   "files": [
     "bin/",
