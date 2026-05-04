@@ -1,7 +1,7 @@
-description: Bobkit vegetable-joke skill smoke eval
+description: Bobkit skill smoke eval
 
 prompts:
-  - file://evals/prompts/vegetable-joke.txt
+  - file://evals/prompts/skill-contract.txt
 
 providers:
   - echo
@@ -9,7 +9,11 @@ providers:
 tests:
   - description: Vegetable joke contract includes the expected joke
     vars:
+      skill_name: vegetable-joke
       request: Tell me a joke about vegetables.
+      expected_contract: >-
+        The vegetable-joke skill should answer with: Why did the lettuce start a
+        band? Because it had a great beet and wanted everyone to romaine friends.
     assert:
       - type: contains
         value: Why did the lettuce start a band?
@@ -17,3 +21,22 @@ tests:
         value: great beet
       - type: contains
         value: romaine friends
+  - description: Feature brainstorm contract includes gated spec-and-plan workflow
+    vars:
+      skill_name: feature-brainstorm
+      request: Help me brainstorm a new feature before we build it.
+      expected_contract: >-
+        The feature-brainstorm skill should ground in the environment before
+        asking questions, avoid implementation during brainstorming, present 2-3
+        approaches with tradeoffs, ask concrete multiple-choice decisions when
+        useful, and end with a decision-complete spec and implementation-ready
+        plan.
+    assert:
+      - type: contains
+        value: feature-brainstorm
+      - type: contains
+        value: ground in the environment
+      - type: contains
+        value: avoid implementation
+      - type: contains
+        value: decision-complete spec

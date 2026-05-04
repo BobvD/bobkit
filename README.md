@@ -2,7 +2,7 @@
 
 Bootstrap for shipping AI-agent skills from a single source of truth to multiple targets (Claude Code, Codex, …) — with evals and a marketplace build wired in.
 
-Today it carries one toy skill (`vegetable-joke`). The plumbing is the point: drop new skills into `.rulesync/skills/` and the pipeline fans them out everywhere.
+Today it carries a toy skill (`vegetable-joke`) and a workflow skill (`feature-brainstorm`). The plumbing is the point: drop new skills into `.rulesync/skills/` and the pipeline fans them out everywhere.
 
 ## How It Works
 

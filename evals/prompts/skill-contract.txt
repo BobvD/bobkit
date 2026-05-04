@@ -1,0 +1,6 @@
+Skill under test: {{skill_name}}
+
+User request: {{request}}
+
+Expected contract:
+{{expected_contract}}
