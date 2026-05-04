@@ -53,6 +53,8 @@ jobs:
             .map((entry) => entry.name);
           const required = [
             'bin/bobkit.mjs',
+            'README.md',
+            'CHANGELOG.md',
             ...skills.flatMap((skill) => [
               `.codex/skills/${skill}/SKILL.md`,
               `.claude/skills/${skill}/SKILL.md`,

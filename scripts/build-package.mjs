@@ -28,10 +28,14 @@ const skills = readdirSync(skillsDir, { withFileTypes: true })
   .map((entry) => entry.name)
   .sort();
 
-const requiredFiles = skills.flatMap((skill) => [
-  `.codex/skills/${skill}/SKILL.md`,
-  `.claude/skills/${skill}/SKILL.md`,
-]);
+const requiredFiles = [
+  'README.md',
+  'CHANGELOG.md',
+  ...skills.flatMap((skill) => [
+    `.codex/skills/${skill}/SKILL.md`,
+    `.claude/skills/${skill}/SKILL.md`,
+  ]),
+];
 
 for (const file of requiredFiles) {
   if (!existsSync(path.join(root, file))) {
