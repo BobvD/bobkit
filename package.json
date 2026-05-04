@@ -3,7 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "bin": {
+    "bobkit": "./bin/bobkit.mjs"
+  },
   "scripts": {
+    "bobkit": "node bin/bobkit.mjs",
+    "install:local": "node bin/bobkit.mjs install",
+    "update:local": "node bin/bobkit.mjs update",
     "rulesync:generate": "npx --yes rulesync@8.13.0 generate",
     "rulesync:check": "npx --yes rulesync@8.13.0 generate --check",
     "eval": "npx --yes promptfoo@0.121.9 eval -c promptfooconfig.yaml --no-progress-bar",
