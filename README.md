@@ -1,142 +1,57 @@
 # Bobkit
 
-Bootstrap for shipping AI-agent skills from a single source of truth to multiple targets (Claude Code, Codex, ...) with evals and a marketplace build wired in.
+Bobkit is a skillset for AI coding agents.
 
-Today it carries five skills: `vegetable-joke`, `create-mr`, `review-mr`, `resolve-mr`, and `feature-brainstorm`. The plumbing is the point: drop new skills into `.rulesync/skills/` and the pipeline fans them out everywhere.
+It gives Codex, Claude Code, and other skill-aware agents reusable workflows for real software work: shaping features, opening pull requests, reviewing pull requests, and resolving review feedback. The `bobkit` CLI is the installer that gets those skills onto your machine.
 
-## How It Works
+## Install
 
-```
-   .rulesync/skills/*           <-- source of truth (committed)
-          |
-          |  rulesync generate
-          v
-   .claude/skills/*             <-- Claude Code (gitignored)
-   .codex/skills/*              <-- Codex CLI    (gitignored)
-          |
-          |  promptfoo eval
-          v
-   pass / fail on prompt contracts
-          |
-          |  scripts/build-claude-plugin.mjs
-          v
-   dist/claude-plugin/          <-- installable plugin
-   dist/claude-marketplace/     <-- local marketplace
-          |
-          |  GitHub Actions on push to main
-          v
-   claude-marketplace branch    <-- remote install target
-```
-
-## Run It
-
-| Task | Command |
-| --- | --- |
-| Install Bobkit globally | `npm install -g bobkit` |
-| Install generated skills globally | `bobkit install` |
-| Update Bobkit and refresh global skills | `npm install -g bobkit@latest && bobkit install` |
-| Generate skills for all targets | `npm run rulesync:generate` |
-| Check generated output is fresh | `npm run rulesync:check` |
-| Run prompt evals | `npm run eval` |
-| Build plugin + marketplace artifacts | `npm run build:claude` |
-| Build npm package assets | `npm run build:package` |
-| What CI runs | `npm run ci` |
-
-## Bobkit CLI
-
-The CLI manages Bobkit skills across projects on this machine. Normal users install it from npm:
+Requirements: Node.js 22 or newer.
 
 ```bash
 npm install -g bobkit
 bobkit install
 ```
 
-The npm package includes pre-generated Codex and Claude skills. `bobkit install` symlinks those bundled skills into:
+`bobkit install` symlinks the bundled skills into:
 
 - `~/.codex/skills`
 - `~/.claude/skills`
 
-Useful commands:
+Restart any open agent sessions after installing so they reload available skills.
 
-```bash
-bobkit list       # list available skills
-bobkit status     # show package mode and global link state
-bobkit doctor     # check prerequisites and broken links
-bobkit install    # refresh global symlinks from bundled skills
-bobkit update     # print the npm upgrade command
-```
+## Use The Skills
 
-## Calling Installed Skills
-
-`bobkit install` installs skills, not shell commands.
-
-In Codex, start a new session after install if one was already open, then name the skill:
+In Codex, call a skill by naming it:
 
 ```text
+$feature-brainstorm Help me shape a new onboarding feature.
 $create-mr
 $review-mr https://github.com/OWNER/REPO/pull/123
-$resolve-mr
-$feature-brainstorm Help me shape a new feature.
+$resolve-mr https://github.com/OWNER/REPO/pull/123
+$vegetable-joke
+```
+
+Natural-language requests work too:
+
+```text
+Use create-mr to open a PR for this branch.
+Use resolve-mr on the current pull request.
 Tell me a joke about vegetables.
 ```
 
-Natural-language requests work too, for example "use create-mr to open a PR for this branch." Do not rely on `/create-mr` in Codex; slash-prefixed input can be intercepted by the client as a built-in command.
+Do not rely on un-namespaced commands like `/create-mr` in Codex; slash-prefixed input can be intercepted by the client as a built-in command.
 
-In Claude Code, global skills can be triggered by asking to use the skill by name. If you install the Bobkit Claude plugin, use the namespaced plugin commands shown below.
-
-For contributors working from a checkout:
+In Claude Code, global skills can be triggered by asking to use the skill by name. Bobkit also ships a Claude plugin:
 
 ```bash
-cd ~/Documents/bobkit
-npm link
-bobkit install --dev
-```
-
-In dev checkout mode, Bobkit can regenerate Rulesync outputs before linking:
-
-```bash
-bobkit install --dev
-bobkit update --dev
-```
-
-If a skill already exists as a normal directory, Bobkit will not overwrite it by default. Use `bobkit install --replace` once when you want Bobkit to adopt those existing local copies as symlinks.
-
-## Publishing To npm
-
-The package name is `bobkit`. `bobkit@0.0.1` has already been published manually once, and npm Trusted Publishing is configured for `BobvD/bobkit` with `.github/workflows/npm-publish.yml`.
-
-Future release flow:
-
-1. Bump the version in `package.json` and `package-lock.json`, for example `npm version patch --no-git-tag-version`.
-2. Add a matching `CHANGELOG.md` entry, for example `## 0.1.0 - ...`.
-3. Run `npm run release:check`.
-4. Open and merge the PR to `main`.
-5. The `npm Publish` workflow sees the unreleased version, runs CI, verifies the package tarball, publishes to npm through Trusted Publishing, creates `v<version>`, and creates a GitHub release from the changelog entry.
-
-Useful release checks:
-
-```bash
-npm view bobkit version dist-tags.latest bin
-gh release view v$(node -p "require('./package.json').version")
-gh run list --workflow "npm Publish" --branch main --limit 5
-```
-
-## Optional RTK
-
-RTK (`rtk-ai/rtk`) may be a useful optional companion for Bobkit later. It can reduce AI-agent context usage by rewriting noisy shell commands through `rtk`, but it is not required for this spike.
-
-## Try The Skills Locally
-
-```bash
-npm run build:claude
+claude plugin marketplace add BobvD/bobkit@claude-marketplace --scope project
+claude plugin install bobkit@bobkit-marketplace --scope project
 ```
 
 Then in Claude Code:
 
-```
-/plugin marketplace add ./dist/claude-marketplace
-/plugin install bobkit@bobkit-marketplace
-/reload-plugins
+```text
 /bobkit:create-mr
 /bobkit:review-mr https://github.com/OWNER/REPO/pull/123
 /bobkit:resolve-mr
@@ -144,24 +59,46 @@ Then in Claude Code:
 /bobkit:vegetable-joke
 ```
 
-## Install From Anywhere
+## Skill Catalog
 
-After CI publishes the `claude-marketplace` branch:
+| Skill | Use It For | What It Does |
+| --- | --- | --- |
+| `feature-brainstorm` | Turning a rough product idea into a buildable plan. | Scans the repo context, challenges the requirement, compares approaches, and ends with an implementation-ready spec. |
+| `create-mr` | Opening a pull request or merge request for the current branch. | Detects GitHub or GitLab, checks the native CLI and auth, summarizes the branch diff, pushes when appropriate, and opens the request. |
+| `review-mr` | Reviewing a GitHub pull request or GitLab merge request. | Fetches metadata and diff context, reviews only changed lines, and posts concrete inline findings with severity labels. |
+| `resolve-mr` | Working through open review comments. | Fetches unresolved threads, classifies each comment, applies scoped fixes, commits, replies, and resolves completed threads. |
+| `vegetable-joke` | A tiny example skill. | Tells one short vegetable joke. |
+
+## Bobkit CLI
+
+The CLI is intentionally small. It installs, refreshes, and diagnoses the local skill links.
 
 ```bash
-claude plugin marketplace add BobvD/bobkit@claude-marketplace --scope project
-claude plugin install bobkit@bobkit-marketplace --scope project
+bobkit list       # list bundled skills
+bobkit status     # show package mode and global link state
+bobkit doctor     # check prerequisites and broken links
+bobkit install    # refresh global skill links
+bobkit update     # print the npm upgrade command
 ```
 
-## Layout
+To update later:
 
-```
-.rulesync/skills/      source skills (edit here)
-rulesync.jsonc         which targets to generate for
-promptfooconfig.yaml   eval config for multi-skill prompt contracts
-plugins/claude/        plugin + marketplace manifests
-scripts/               build script for Claude artifacts
-.github/workflows/     CI: build, eval, publish marketplace branch
+```bash
+npm install -g bobkit@latest
+bobkit install
 ```
 
-`.claude/`, `.codex/`, and `dist/` are generated. Never edit them by hand.
+If a skill already exists locally as a normal directory, Bobkit will not overwrite it by default. Use `bobkit install --replace` once when you want Bobkit to adopt those existing local copies as symlinks.
+
+## How Bobkit Ships Skills
+
+Bobkit keeps each source skill once under `.rulesync/skills/`, then generates target-specific skills for Codex and Claude Code. Prompt evals check that the generated skills still satisfy their workflow contracts, and CI publishes the npm package plus the Claude plugin marketplace branch.
+
+For development setup, skill authoring, generated files, and build commands, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+For version bumps and npm publishing, see [RELEASING.md](RELEASING.md).
+
+## Links
+
+- [Changelog](CHANGELOG.md)
+- [Issues](https://github.com/BobvD/bobkit/issues)
