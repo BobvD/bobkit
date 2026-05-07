@@ -82,19 +82,15 @@ Each finding is one inline comment, anchored to a specific file and line range, 
 
 Do not put file paths or line numbers in the body — the API attaches them. One issue per comment.
 
-### 6. Draft the review locally and show the user
+### 6. Build the review payload
 
-Build the review payload as a JSON file in a temp location. Then print a concise summary to the user:
+Build the review payload as a JSON file in a temp location. Pick the review event:
 
-- Total findings, broken down by severity.
-- One-line preview of each finding (`path:line — [severity] short text`).
-- Proposed review event: `COMMENT` by default; `REQUEST_CHANGES` only if at least one `[blocking]` finding exists; `APPROVE` only if zero findings *and* the user explicitly asked for an approval.
-
-Ask the user to approve, edit, or cancel before any network call posts comments.
+- `COMMENT` by default.
+- `REQUEST_CHANGES` only if at least one `[blocking]` finding exists.
+- `APPROVE` only if zero findings *and* the user explicitly asked for an approval.
 
 ### 7. Submit the review
-
-Only after explicit approval.
 
 #### GitHub (pending-review pattern)
 
@@ -171,7 +167,6 @@ Print:
 
 ## Guardrails
 
-- Never submit the review without explicit user approval of the draft.
 - Never post `REQUEST_CHANGES` unless at least one `[blocking]` finding is present.
 - Never `APPROVE` automatically — approval is a human judgement call.
 - Do not edit the MR/PR body, change labels, assignees, or merge state.
