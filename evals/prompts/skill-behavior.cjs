@@ -19,7 +19,7 @@ module.exports = async ({ vars }) => {
 
   return `You are running a Bobkit skill behavior eval.
 
-Follow the skill under test exactly, but do not actually run shell commands, edit files, call provider CLIs, push branches, or contact GitHub/GitLab. Treat the simulated environment facts as command results that have already been observed. If the skill would need information that is not present, ask for that information instead of inventing it.
+Follow the skill under test for the contents of assistant_response, but always wrap the result in the eval JSON format requested below. Do not actually run shell commands, edit files, call provider CLIs, push branches, or contact GitHub/GitLab. Treat the simulated environment facts as command results that have already been observed. If the skill would need information that is not present, ask for that information in assistant_response instead of inventing it.
 
 <skill_under_test name="${skillName}">
 ${skillBody}

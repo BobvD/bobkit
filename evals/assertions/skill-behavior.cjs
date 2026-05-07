@@ -42,7 +42,14 @@ const requireJsonShape = (result) => {
 };
 
 const evaluate = (output, checks) => {
-  const result = parseJsonOutput(output);
+  let result;
+
+  try {
+    result = parseJsonOutput(output);
+  } catch (err) {
+    return fail(`Could not parse JSON response: ${err.message}`);
+  }
+
   const shapeError = requireJsonShape(result);
 
   if (shapeError) {
@@ -125,7 +132,11 @@ module.exports.reviewMrMissingUrl = (output) =>
         : 'review-mr should stop for the missing PR/MR URL',
     (result) => {
       const body = lowerText(result);
-      return body.includes('url') && (body.includes('pr') || body.includes('pull request') || body.includes('mr') || body.includes('merge request'))
+      return body.includes('url') &&
+        (/\bpr\b/i.test(text(result)) ||
+          body.includes('pull request') ||
+          /\bmr\b/i.test(text(result)) ||
+          body.includes('merge request'))
         ? null
         : 'review-mr should ask for a PR/MR URL';
     },
