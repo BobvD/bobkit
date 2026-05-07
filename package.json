@@ -1,7 +1,7 @@
 {
   "name": "bobkit",
   "version": "0.1.0",
-  "description": "CLI for installing and updating Bobkit AI-agent skills across local agent runtimes.",
+  "description": "AI-agent skillset for repeatable software workflows, with a CLI installer for Codex and Claude Code.",
   "type": "module",
   "bin": {
     "bobkit": "bin/bobkit.mjs"
@@ -11,6 +11,8 @@
     ".codex/skills/",
     ".claude/skills/",
     "README.md",
+    "CONTRIBUTING.md",
+    "RELEASING.md",
     "CHANGELOG.md"
   ],
   "engines": {
