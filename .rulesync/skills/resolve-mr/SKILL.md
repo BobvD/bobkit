@@ -22,17 +22,19 @@ Two modes:
   - GitHub: `https://<github-host>/<owner>/<repo>/pull/<number>` → host=github, capture hostname, owner, repo, number; build `repo_arg` (`<owner>/<repo>` for `github.com`, `<github-host>/<owner>/<repo>` for Enterprise).
   - GitLab: `https://<gitlab-host>/<group>(/<subgroup>)*/<repo>/-/merge_requests/<iid>` → host=gitlab, capture hostname, full project path, IID, full project URL.
   - Anything else: stop and ask the user to confirm the host.
+  - Fetch request metadata, including source branch and head SHA (`gh pr view ... --json headRefName,headRefOid` or the GitLab MR version refs).
+  - Confirm the local checkout is the request's source branch and `git rev-parse HEAD` matches the request head SHA before applying fixes. If it does not match, stop and ask the user to check out and update the PR/MR head branch.
 - **No URL given:** detect from the current branch.
   - Confirm git repo with `git rev-parse --show-toplevel`.
   - Read `git remote -v`; prefer the upstream remote of the current branch (`git rev-parse --abbrev-ref --symbolic-full-name @{u}`) when set.
   - Get the current branch with `git branch --show-current`. If on `main`/`master`/default, stop and ask the user to switch to the feature branch.
   - Find the open request:
-    - GitHub: `gh pr list --head <branch> --state open --repo <repo_arg> --json number,url,headRefOid,baseRefName,headRefName`.
-    - GitLab: `glab mr list --source-branch <branch> --state opened --repo <full-project-url>`.
+    - GitHub: `gh pr list --head <branch> --state open --json number,url,headRefOid,baseRefName,headRefName` (gh defaults to the current repo).
+    - GitLab: `glab mr list --source-branch <branch> --state opened` (glab defaults to the current repo).
   - 0 results: stop and tell the user — suggest pushing the branch or passing a URL.
   - 1 result: use it.
   - 2+ results: list them and ask the user which one.
-  - Warn if `git rev-list @{u}..HEAD` shows local commits not on the remote — the diff the comments anchor to may not include them.
+  - If the branch has an upstream, warn when `git rev-list @{u}..HEAD` shows local commits not on the remote — the diff the comments anchor to may not include them.
 
 ### 2. Verify the CLI
 
@@ -65,13 +67,20 @@ gh api graphql --hostname <github-host> \
             path
             line
             startLine
-            comments(first: 50) {
+            firstComment: comments(first: 1) {
               nodes {
                 databaseId
                 body
                 diffHunk
                 originalLine
                 outdated
+                author { login }
+              }
+            }
+            latestComment: comments(last: 1) {
+              nodes {
+                databaseId
+                body
                 author { login }
               }
             }
@@ -82,7 +91,7 @@ gh api graphql --hostname <github-host> \
   }'
 ```
 
-Loop while `pageInfo.hasNextPage=true`, passing the previous `endCursor` as `after`, so PRs with more than 100 review threads are fully scanned. Keep only threads where `isResolved=false`. Also fetch issue-level (general PR) comments via `gh api --hostname <github-host> repos/<owner>/<repo>/issues/<number>/comments` — these are not resolvable on GitHub; treat them as informational and only reply if substantive.
+Loop while `pageInfo.hasNextPage=true`, passing the previous `endCursor` as `after`, so PRs with more than 100 review threads are fully scanned. Keep only threads where `isResolved=false`. Use `firstComment.nodes[0]` for the reply anchor and diff hunk, and `latestComment.nodes[0]` for loop-guard checks. Also fetch issue-level (general PR) comments via `gh api --hostname <github-host> repos/<owner>/<repo>/issues/<number>/comments` — these are not resolvable on GitHub; treat them as informational and only reply if substantive.
 
 #### GitLab (REST discussions)
 
@@ -92,11 +101,11 @@ glab api --hostname <gitlab-host> \
   --paginate
 ```
 
-Keep only discussions where `resolved=false` and `resolvable=true`. Each discussion's `notes[0]` is the original comment; later notes are existing replies. Inline comments have `notes[0].type == "DiffNote"` and a `position` block with `new_path`/`new_line`; general comments have no `position`.
+Keep only discussions where `resolved=false` and `resolvable=true`. Each discussion's `notes[0]` is the original comment; later notes are existing replies. A discussion is inline when `notes[0].position` is present (with `new_path`/`new_line`); without `position` it's a general comment.
 
 #### Filter out our own follow-ups
 
-Skip any thread whose most recent note/comment was posted by /resolve-mr (detected via the attribution footer `_— Addressed via /resolve-mr` in the body). Otherwise the skill will loop on disputes or pending clarification asks.
+Skip any thread whose most recent note/comment was posted by /resolve-mr (detected via the attribution footer `_— Addressed via /resolve-mr` in the latest comment body). Otherwise the skill will loop on disputes or pending clarification asks.
 
 If the total unresolved thread count exceeds ~30, tell the user the count and ask whether to address all of them, only `[blocking]`/`[important]` ones, or a specific file.
 
