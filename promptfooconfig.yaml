@@ -96,6 +96,52 @@ tests:
         value: approve only
       - type: contains
         value: failed posts
+  - description: Resolve MR contract includes thread fetch, judgment buckets, and reply+resolve flow
+    vars:
+      skill_name: resolve-mr
+      request: /resolve-mr
+      expected_contract: >-
+        The resolve-mr skill should accept an optional MR or PR URL or detect
+        the open request for the current branch via gh pr list or glab mr list,
+        detect GitHub or GitLab from the URL or remotes including self-hosted
+        hostnames, verify gh or glab installation and authentication for that
+        hostname, fetch unresolved threads using GitHub GraphQL reviewThreads
+        with isResolved or GitLab discussions REST, skip threads whose latest
+        comment is its own AI attribution footer to avoid loops, judge each
+        comment as apply, already-addressed, disagree, clarify, or defer, apply
+        in-scope fixes without unrelated refactors, commit a single fix-only
+        commit without amending or bypassing hooks, reply to each thread with
+        the AI attribution footer, resolve only apply or already-addressed
+        threads, push automatically when an upstream is set, never force-push
+        or push to protected branches, never approve the MR/PR, not run tests
+        or lint unless asked, continue past per-thread reply or resolve
+        failures, and report counts by outcome with the commit SHA and any
+        failed posts.
+    assert:
+      - type: contains
+        value: resolve-mr
+      - type: contains
+        value: GitHub or GitLab
+      - type: contains
+        value: gh pr list
+      - type: contains
+        value: glab mr list
+      - type: contains
+        value: reviewThreads
+      - type: contains
+        value: discussions
+      - type: contains
+        value: AI attribution footer
+      - type: contains
+        value: apply, already-addressed, disagree, clarify, or defer
+      - type: contains
+        value: fix-only commit
+      - type: contains
+        value: never force-push
+      - type: contains
+        value: never approve
+      - type: contains
+        value: counts by outcome
   - description: Feature brainstorm contract includes gated spec-and-plan workflow
     vars:
       skill_name: feature-brainstorm

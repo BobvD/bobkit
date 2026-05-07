@@ -2,7 +2,7 @@
 
 Bootstrap for shipping AI-agent skills from a single source of truth to multiple targets (Claude Code, Codex, ...) with evals and a marketplace build wired in.
 
-Today it carries four skills: `vegetable-joke`, `create-mr`, `review-mr`, and `feature-brainstorm`. The plumbing is the point: drop new skills into `.rulesync/skills/` and the pipeline fans them out everywhere.
+Today it carries five skills: `vegetable-joke`, `create-mr`, `review-mr`, `resolve-mr`, and `feature-brainstorm`. The plumbing is the point: drop new skills into `.rulesync/skills/` and the pipeline fans them out everywhere.
 
 ## How It Works
 
@@ -121,6 +121,7 @@ Then in Claude Code:
 /reload-plugins
 /bobkit:create-mr
 /bobkit:review-mr https://github.com/OWNER/REPO/pull/123
+/bobkit:resolve-mr
 /bobkit:feature-brainstorm
 /bobkit:vegetable-joke
 ```
