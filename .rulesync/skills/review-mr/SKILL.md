@@ -1,6 +1,6 @@
 ---
 name: review-mr
-description: Review a merge request or pull request from a GitHub/GitLab URL and post inline comments with concrete suggestions. Use when the user asks to review an MR/PR, invokes /review-mr, or shares a PR/MR link asking for feedback.
+description: Review a merge request or pull request from a GitHub/GitLab URL and post inline comments with concrete suggestions. Use when the user asks to review an MR/PR, explicitly names review-mr / $review-mr, or shares a PR/MR link asking for feedback.
 targets: ["*"]
 codexcli:
   short-description: Review a GitLab MR or GitHub PR with inline comments
@@ -11,6 +11,10 @@ copilot:
 # Review MR
 
 Review a merge request or pull request and post inline, line-level comments with concrete improvement suggestions. Detect the host from the URL, fetch the diff with the native CLI, draft the review locally, submit it immediately, and report the result after submission.
+
+## Invocation
+
+Trigger this skill by naming it (`$review-mr <url>` in Codex) or with a natural-language request such as "use review-mr on this PR". Do not rely on un-namespaced `/review-mr`; some clients reserve slash-prefixed input for built-in commands.
 
 ## Workflow
 

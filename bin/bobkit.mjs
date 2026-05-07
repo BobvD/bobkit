@@ -105,6 +105,7 @@ function install(flags) {
   }
 
   linkGeneratedSkills(flags);
+  printInvocationHelp(flags.targets);
 }
 
 function update(flags) {
@@ -156,6 +157,8 @@ function status() {
 
   console.log('');
   printSkillTable();
+  console.log('');
+  printInvocationHelp(['codex', 'claude']);
 }
 
 function doctor() {
@@ -268,6 +271,21 @@ function printSkillTable() {
     const codex = linkStatus(path.join(targets.codex.installDir, skill), path.join(targets.codex.generatedDir, skill));
     const claude = linkStatus(path.join(targets.claude.installDir, skill), path.join(targets.claude.generatedDir, skill));
     console.log(`${skill.padEnd(20)} codex=${codex.padEnd(12)} claude=${claude}`);
+  }
+}
+
+function printInvocationHelp(targetNames) {
+  const targetSet = new Set(targetNames);
+
+  console.log('Call installed skills like this:');
+
+  if (targetSet.has('codex')) {
+    console.log('  Codex:  $create-mr, $review-mr <url>, $resolve-mr, $feature-brainstorm ...');
+    console.log('          Restart open Codex sessions after installing so they reload skills.');
+  }
+
+  if (targetSet.has('claude')) {
+    console.log('  Claude: ask to use the skill by name; plugin installs may expose /bobkit:<skill>.');
   }
 }
 
@@ -452,6 +470,9 @@ Options:
   --dry-run      Print actions without changing files or running git pull.
   --codex-only   Manage only ~/.codex/skills.
   --claude-only  Manage only ~/.claude/skills.
+
+Call installed Codex skills by naming them, for example $create-mr or $review-mr <url>.
+Restart open Codex sessions after installing so they reload skills.
 `);
 }
 

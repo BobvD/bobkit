@@ -1,6 +1,6 @@
 {
   "name": "bobkit",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "CLI for installing and updating Bobkit AI-agent skills across local agent runtimes.",
   "type": "module",
   "bin": {
