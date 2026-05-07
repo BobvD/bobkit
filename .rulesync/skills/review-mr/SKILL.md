@@ -70,15 +70,22 @@ Review **only lines introduced by this MR/PR** (the `+` side of the diff). Do no
 
 Each finding is one inline comment, anchored to a specific file and line range, with:
 
-1. A severity tag at the start of the body, from this fixed vocabulary:
-   - `[blocking]` — must be fixed before merge (correctness, security, broken contract).
-   - `[important]` — should be fixed but not strictly blocking.
-   - `[nit]` — small improvement, author's discretion.
-   - `[suggestion]` — alternative worth considering.
+1. A severity tag at the start of the body, prefixed with its priority emoji, from this fixed vocabulary (most urgent first):
+   - 🚨 `[blocking]` — must be fixed before merge (correctness, security, broken contract).
+   - ⚠️ `[important]` — should be fixed but not strictly blocking.
+   - 💡 `[suggestion]` — alternative worth considering.
+   - 📝 `[nit]` — small improvement, author's discretion.
 2. One or two sentences explaining the issue and the failure scenario.
 3. When proposing concrete code, include a suggestion block the platform can apply with one click:
    - **GitHub:** ```` ```suggestion ```` ... ```` ``` ````
    - **GitLab:** ```` ```suggestion:-0+0 ```` ... ```` ``` ```` (the `-0+0` line range is required)
+4. End the body with an attribution footer on its own line so the comment is not mistaken for a human review (the platform posts under the user's account):
+
+   ```
+   _— AI code review via /review-mr ({model})_
+   ```
+
+   Replace `{model}` with the active model name (e.g. `Claude Opus 4.7`). Separate the footer from the body with a blank line.
 
 Do not put file paths or line numbers in the body — the API attaches them. One issue per comment.
 
@@ -113,7 +120,7 @@ gh api -X POST repos/<owner>/<repo>/pulls/<number>/reviews \
       "path": "src/auth.ts",
       "line": 67,
       "side": "RIGHT",
-      "body": "[blocking] Missing await — promise resolves after the response is sent.\n\n```suggestion\n  await authorize(user);\n```"
+      "body": "🚨 [blocking] Missing await — promise resolves after the response is sent.\n\n```suggestion\n  await authorize(user);\n```\n\n_— AI code review via /review-mr (Claude Opus 4.7)_"
     },
     {
       "path": "src/auth.ts",
@@ -121,7 +128,7 @@ gh api -X POST repos/<owner>/<repo>/pulls/<number>/reviews \
       "start_side": "RIGHT",
       "line": 95,
       "side": "RIGHT",
-      "body": "[important] State is not cleaned up on the error path."
+      "body": "⚠️ [important] State is not cleaned up on the error path.\n\n_— AI code review via /review-mr (Claude Opus 4.7)_"
     }
   ]
 }
@@ -143,7 +150,7 @@ glab api projects/<urlencoded-path>/merge_requests/<iid>/discussions \
 
 ```json
 {
-  "body": "[blocking] Null pointer on empty input.\n\n```suggestion:-0+0\n  if (!items?.length) return;\n```",
+  "body": "🚨 [blocking] Null pointer on empty input.\n\n```suggestion:-0+0\n  if (!items?.length) return;\n```\n\n_— AI code review via /review-mr (Claude Opus 4.7)_",
   "position": {
     "position_type": "text",
     "base_sha": "<base_commit_sha>",
