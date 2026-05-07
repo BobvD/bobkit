@@ -1,0 +1,76 @@
+description: Bobkit Claude behavior evals
+
+prompts:
+  - file://evals/prompts/skill-behavior.cjs
+
+providers:
+  - id: anthropic:messages:claude-sonnet-4-6
+    config:
+      apiKeyRequired: false
+      temperature: 0
+      max_tokens: 1200
+
+tests:
+  - description: Vegetable joke returns the exact skill response
+    vars:
+      skill_name: vegetable-joke
+      request: Tell me a joke about vegetables.
+      scenario: |-
+        Normal chat request. No repository or command context is needed.
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:vegetableJoke
+
+  - description: Feature brainstorm stays in planning mode, uses repo context, and asks a decision
+    vars:
+      skill_name: feature-brainstorm
+      request: I want to set up Claude evals for Bobkit skills. Help me figure it out before we build it.
+      scenario: |-
+        Repository context already inspected:
+        - Bobkit has five source skills under .rulesync/skills.
+        - promptfooconfig.yaml currently runs free Promptfoo smoke evals with the echo provider.
+        - evals/prompts/skill-contracts.txt currently includes expected_contract text, so it is not suitable for a real model behavior eval.
+        - package.json has npm run eval for smoke evals and npm run ci uses build:claude plus eval.
+        - CONTRIBUTING.md documents contributor commands and validation.
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:featureBrainstorm
+
+  - description: Create MR stops outside a git repository
+    vars:
+      skill_name: create-mr
+      request: $create-mr
+      scenario: |-
+        Simulated command result:
+        - git rev-parse --show-toplevel exits 128 with "fatal: not a git repository".
+        No other commands have been run.
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:createMrNonGit
+
+  - description: Review MR requires an explicit PR or MR URL
+    vars:
+      skill_name: review-mr
+      request: $review-mr
+      scenario: |-
+        The user did not provide a pull request or merge request URL.
+        No current branch or remote should be guessed for this skill.
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:reviewMrMissingUrl
+
+  - description: Resolve MR stops on the default branch
+    vars:
+      skill_name: resolve-mr
+      request: $resolve-mr
+      scenario: |-
+        Simulated command results:
+        - git rev-parse --show-toplevel prints "/tmp/bobkit".
+        - git remote -v shows origin git@github.com:BobvD/bobkit.git.
+        - git rev-parse --abbrev-ref --symbolic-full-name @{u} prints origin/main.
+        - git branch --show-current prints main.
+        The repository default branch is main.
+        No PR lookup has been run.
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:resolveMrDefaultBranch
