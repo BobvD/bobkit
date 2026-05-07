@@ -85,14 +85,23 @@ If a skill already exists as a normal directory, Bobkit will not overwrite it by
 
 ## Publishing To npm
 
-The package name is `bobkit`. Release flow:
+The package name is `bobkit`. `bobkit@0.0.1` has already been published manually once, and npm Trusted Publishing is configured for `BobvD/bobkit` with `.github/workflows/npm-publish.yml`.
+
+Future release flow:
 
 1. Bump the version in `package.json` and `package-lock.json`, for example `npm version patch --no-git-tag-version`.
 2. Add a matching `CHANGELOG.md` entry, for example `## 0.1.0 - ...`.
-3. Merge the PR to `main`.
-4. The `npm Publish` workflow sees the unreleased version, runs CI, verifies the package tarball, publishes to npm, creates `v<version>`, and creates a GitHub release from the changelog entry.
+3. Run `npm run release:check`.
+4. Open and merge the PR to `main`.
+5. The `npm Publish` workflow sees the unreleased version, runs CI, verifies the package tarball, publishes to npm through Trusted Publishing, creates `v<version>`, and creates a GitHub release from the changelog entry.
 
-One-time npm setup is required before the first release: configure npm Trusted Publishing for `BobvD/bobkit` and `.github/workflows/npm-publish.yml` on the `main` branch.
+Useful release checks:
+
+```bash
+npm view bobkit version dist-tags.latest bin
+gh release view v$(node -p "require('./package.json').version")
+gh run list --workflow "npm Publish" --branch main --limit 5
+```
 
 ## Optional RTK
 
