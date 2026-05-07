@@ -47,12 +47,14 @@ If the version in `package.json` is already published, the workflow validates an
 
 ## Package Contents
 
-`npm run build:package` regenerates target skills and verifies the npm tarball contains the bundled Codex and Claude skills plus package docs:
+`npm run build:package` regenerates target skills and checks that required package files exist before npm packing. The published tarball should include:
 
 ```text
 .codex/skills/
 .claude/skills/
 README.md
+CONTRIBUTING.md
+RELEASING.md
 CHANGELOG.md
 bin/
 package.json

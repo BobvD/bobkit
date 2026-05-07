@@ -29,7 +29,7 @@ $feature-brainstorm Help me shape a new onboarding feature.
 $create-mr
 $review-mr https://github.com/OWNER/REPO/pull/123
 $resolve-mr https://github.com/OWNER/REPO/pull/123
-Tell me a joke about vegetables.
+$vegetable-joke
 ```
 
 Natural-language requests work too:
@@ -37,6 +37,7 @@ Natural-language requests work too:
 ```text
 Use create-mr to open a PR for this branch.
 Use resolve-mr on the current pull request.
+Tell me a joke about vegetables.
 ```
 
 Do not rely on un-namespaced commands like `/create-mr` in Codex; slash-prefixed input can be intercepted by the client as a built-in command.
