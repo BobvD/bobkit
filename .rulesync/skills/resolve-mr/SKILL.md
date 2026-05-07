@@ -49,13 +49,15 @@ Pull threads, not single comments — you need the whole conversation to decide.
 ```bash
 gh api graphql --hostname <github-host> \
   -F owner=<owner> -F repo=<repo> -F number=<number> \
+  -F after=null \
   -f query='
-  query($owner: String!, $repo: String!, $number: Int!) {
+  query($owner: String!, $repo: String!, $number: Int!, $after: String) {
     repository(owner: $owner, name: $repo) {
       pullRequest(number: $number) {
         id
         headRefOid
-        reviewThreads(first: 100) {
+        reviewThreads(first: 100, after: $after) {
+          pageInfo { hasNextPage endCursor }
           nodes {
             id
             isResolved
@@ -80,7 +82,7 @@ gh api graphql --hostname <github-host> \
   }'
 ```
 
-Keep only threads where `isResolved=false`. Also fetch issue-level (general PR) comments via `gh api repos/<owner>/<repo>/issues/<number>/comments` — these are not resolvable on GitHub; treat them as informational and only reply if substantive.
+Loop while `pageInfo.hasNextPage=true`, passing the previous `endCursor` as `after`, so PRs with more than 100 review threads are fully scanned. Keep only threads where `isResolved=false`. Also fetch issue-level (general PR) comments via `gh api --hostname <github-host> repos/<owner>/<repo>/issues/<number>/comments` — these are not resolvable on GitHub; treat them as informational and only reply if substantive.
 
 #### GitLab (REST discussions)
 
@@ -111,7 +113,7 @@ For every unresolved thread, read the file at the referenced path and lines (use
 Rules of thumb:
 
 - Effort is not a tiebreaker. If a fix is correct and in scope, apply it even if it's tedious.
-- Praise / pure questions / "thanks!" — reply briefly and resolve (apply category does not apply).
+- Praise / pure questions / "thanks!" — bucket as **already-addressed**, reply briefly, and resolve.
 - Comments on lines that are no longer in the file → almost always **already-addressed**.
 - Subjective style preferences without a concrete failure case → usually **disagree** with a one-line reason, or **apply** if it genuinely improves readability and the cost is trivial.
 - Security / correctness / data-loss concerns: when in doubt, apply. Never **disagree** with a security comment unless you can demonstrate the threat model is wrong.
@@ -180,7 +182,7 @@ gh api graphql --hostname <github-host> \
   }'
 ```
 
-For issue-level comments (no thread id), reply with `gh api repos/<owner>/<repo>/issues/<number>/comments -X POST -f body="..."`. There is no resolve action for these on GitHub; do not attempt one.
+For issue-level comments (no thread id), reply with `gh api --hostname <github-host> repos/<owner>/<repo>/issues/<number>/comments -X POST -f body="..."`. There is no resolve action for these on GitHub; do not attempt one.
 
 #### GitLab
 
