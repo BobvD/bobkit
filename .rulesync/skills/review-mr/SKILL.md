@@ -18,27 +18,27 @@ Review a merge request or pull request and post inline, line-level comments with
 
 The user must provide an MR or PR URL as argument. If they did not, ask for one — do not guess from the current branch.
 
-- GitHub: `https://github.com/<owner>/<repo>/pull/<number>` → set host=github, capture owner, repo, number.
-- GitLab: `https://<host>/<group>(/<subgroup>)*/<repo>/-/merge_requests/<iid>` → set host=gitlab, capture the full project path and the IID.
+- GitHub: `https://<github-host>/<owner>/<repo>/pull/<number>` → set host=github, capture the GitHub hostname (`github.com` or a GitHub Enterprise host), owner, repo, and number. Build `repo_arg` as `<owner>/<repo>` for `github.com`, or `<github-host>/<owner>/<repo>` for Enterprise.
+- GitLab: `https://<gitlab-host>/<group>(/<subgroup>)*/<repo>/-/merge_requests/<iid>` → set host=gitlab, capture the GitLab hostname, full project path, IID, and full project URL.
 - If the URL does not match either pattern, stop and ask the user to confirm the host.
 
 ### 2. Verify the CLI
 
 - GitHub → require `gh`. GitLab → require `glab`.
-- Check installation with `command -v gh` / `command -v glab`. If missing, stop and suggest `brew install gh` or `brew install glab`. Do not install on the user's behalf.
-- Check auth with `gh auth status` / `glab auth status`. If unauthenticated, stop and ask the user to run `gh auth login` / `glab auth login`.
+- Check installation with `command -v gh` / `command -v glab`. If missing, stop and ask the user to install it. Suggest `brew install gh` or `brew install glab` on macOS, and mention the official package manager docs for other systems. Do not install on the user's behalf.
+- Check auth with `gh auth status --hostname <github-host>` / `glab auth status --hostname <gitlab-host>`. If unauthenticated, stop and ask the user to run `gh auth login` / `glab auth login` for that hostname.
 
 ### 3. Fetch MR/PR context
 
 Pull only what you need to review:
 
 - **GitHub:**
-  - Metadata: `gh pr view <number> --repo <owner>/<repo> --json title,body,baseRefName,headRefName,headRefOid,author,additions,deletions,files`
-  - Diff: `gh pr diff <number> --repo <owner>/<repo>`
+  - Metadata: `gh pr view <number> --repo <repo_arg> --json title,body,baseRefName,headRefName,headRefOid,author,additions,deletions,files`
+  - Diff: `gh pr diff <number> --repo <repo_arg>`
 - **GitLab:**
-  - Metadata: `glab mr view <iid> --repo <project-path>` (or `glab api projects/<urlencoded>/merge_requests/<iid>`)
-  - Diff: `glab mr diff <iid> --repo <project-path>`
-  - Diff refs (needed for inline positioning): `glab api projects/<urlencoded>/merge_requests/<iid>/versions` → keep `base_commit_sha`, `start_commit_sha`, `head_commit_sha` from element `[0]`.
+  - Metadata: `glab mr view <iid> --repo <full-project-url>` (or `glab api --hostname <gitlab-host> projects/<urlencoded>/merge_requests/<iid>`)
+  - Diff: `glab mr diff <iid> --repo <full-project-url>`
+  - Diff refs (needed for inline positioning): `glab api --hostname <gitlab-host> projects/<urlencoded>/merge_requests/<iid>/versions` → keep `base_commit_sha`, `start_commit_sha`, `head_commit_sha` from the first element (the most recent version).
 
 If the diff is large (over ~1500 changed lines), tell the user and ask whether to focus on specific files.
 
@@ -91,11 +91,11 @@ Do not put file paths or line numbers in the body — the API attaches them. One
 
 ### 6. Build the review payload
 
-Build the host-specific review payload file(s) in a temp location: GitHub uses one review JSON file, while GitLab uses one discussion JSON file per finding plus a summary note. Pick the review event:
+Build the host-specific review payload file(s) in a temp location: GitHub uses one review JSON file, while GitLab uses one discussion JSON file per finding plus a summary note. Pick the platform action:
 
-- `COMMENT` by default.
-- `REQUEST_CHANGES` only if at least one `[blocking]` finding exists.
-- `APPROVE` only if zero findings *and* the user explicitly asked for an approval.
+- Post comments by default.
+- GitHub: use `REQUEST_CHANGES` only if at least one `[blocking]` finding exists.
+- Approve only if zero findings *and* the user explicitly asked for an approval: GitHub uses `APPROVE`, GitLab uses `glab mr approve`.
 
 ### 7. Submit the review
 
@@ -104,7 +104,7 @@ Build the host-specific review payload file(s) in a temp location: GitHub uses o
 `gh pr review` cannot post multiple inline comments, so use the REST API:
 
 ```bash
-gh api -X POST repos/<owner>/<repo>/pulls/<number>/reviews \
+gh api --hostname <github-host> -X POST repos/<owner>/<repo>/pulls/<number>/reviews \
   --input review.json
 ```
 
@@ -134,14 +134,14 @@ gh api -X POST repos/<owner>/<repo>/pulls/<number>/reviews \
 }
 ```
 
-For multi-line comments, set `start_line` + `start_side` plus `line` + `side`. `side` is `RIGHT` for added lines, `LEFT` for unchanged/removed.
+For multi-line comments, set `start_line` + `start_side` plus `line` + `side`. `side` is `RIGHT` for added lines and unchanged context lines, `LEFT` for deletions only.
 
 #### GitLab (discussions API)
 
 `glab mr note` is single-line and untargeted; use the discussions endpoint with a position object:
 
 ```bash
-glab api projects/<urlencoded-path>/merge_requests/<iid>/discussions \
+glab api --hostname <gitlab-host> projects/<urlencoded-path>/merge_requests/<iid>/discussions \
   --method POST --header "Content-Type: application/json" \
   --input discussion.json
 ```
@@ -156,14 +156,22 @@ glab api projects/<urlencoded-path>/merge_requests/<iid>/discussions \
     "base_sha": "<base_commit_sha>",
     "start_sha": "<start_commit_sha>",
     "head_sha": "<head_commit_sha>",
-    "old_path": "src/auth.ts",
+    "old_path": "src/old-auth.ts",
     "new_path": "src/auth.ts",
     "new_line": 67
   }
 }
 ```
 
-For unchanged-side comments, set `old_line` instead of `new_line`. After the per-finding calls, post a summary note via `glab mr note <iid> -m "..."` with totals and severity breakdown.
+For non-renamed files, `old_path` and `new_path` are the same. For renames, `old_path` must be the pre-rename path and `new_path` must be the current path.
+
+For deletion comments, set `old_line` instead of `new_line`. Context lines can use either; `new_line` is the safer default. Continue posting remaining discussion payloads if one per-finding call fails, and include failed path/line/error details in the report. After the per-finding calls, post a summary note via `glab mr note <iid> --repo <full-project-url> -m "..."` with totals and severity breakdown.
+
+If there are zero findings and the user explicitly asked for approval, approve instead of posting discussions:
+
+```bash
+glab mr approve <iid> --repo <full-project-url> --sha <head_commit_sha>
+```
 
 ### 8. Report back
 
