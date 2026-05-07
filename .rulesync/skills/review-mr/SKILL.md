@@ -10,7 +10,7 @@ copilot:
 
 # Review MR
 
-Review a merge request or pull request and post inline, line-level comments with concrete improvement suggestions. Detect the host from the URL, fetch the diff with the native CLI, draft the review locally, show it to the user, and only submit after explicit approval.
+Review a merge request or pull request and post inline, line-level comments with concrete improvement suggestions. Detect the host from the URL, fetch the diff with the native CLI, draft the review locally, submit it immediately, and report the result after submission.
 
 ## Workflow
 
@@ -91,7 +91,7 @@ Do not put file paths or line numbers in the body — the API attaches them. One
 
 ### 6. Build the review payload
 
-Build the review payload as a JSON file in a temp location. Pick the review event:
+Build the host-specific review payload file(s) in a temp location: GitHub uses one review JSON file, while GitLab uses one discussion JSON file per finding plus a summary note. Pick the review event:
 
 - `COMMENT` by default.
 - `REQUEST_CHANGES` only if at least one `[blocking]` finding exists.
