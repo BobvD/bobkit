@@ -1,6 +1,6 @@
 ---
 name: resolve-mr
-description: Resolve open review comments on a merge request or pull request — read each comment, decide if it's correct, apply fixes in code, commit, then reply and mark the thread resolved. Use when the user asks to address/resolve MR or PR comments, invokes /resolve-mr, or shares a PR/MR link asking to fix the feedback.
+description: Resolve open review comments on a merge request or pull request — read each comment, decide if it's correct, apply fixes in code, commit, then reply and mark the thread resolved. Use when the user asks to address/resolve MR or PR comments, explicitly names resolve-mr / $resolve-mr, or shares a PR/MR link asking to fix the feedback.
 targets: ["*"]
 codexcli:
   short-description: Address open MR/PR review comments — fix, commit, reply, resolve
@@ -11,6 +11,10 @@ copilot:
 # Resolve MR
 
 Address open review comments on a merge request or pull request. For each unresolved comment, judge whether it is correct, apply the fix in code (or push back politely if it's wrong), commit, reply, and mark the thread resolved on the platform. Detect the host from the URL or current branch, use the native CLI for everything, and report what was applied vs. disputed at the end.
+
+## Invocation
+
+Trigger this skill by naming it (`$resolve-mr` or `$resolve-mr <url>` in Codex) or with a natural-language request such as "use resolve-mr on this PR". Do not rely on un-namespaced `/resolve-mr`; some clients reserve slash-prefixed input for built-in commands.
 
 ## Workflow
 

@@ -66,6 +66,24 @@ bobkit install    # refresh global symlinks from bundled skills
 bobkit update     # print the npm upgrade command
 ```
 
+## Calling Installed Skills
+
+`bobkit install` installs skills, not shell commands.
+
+In Codex, start a new session after install if one was already open, then name the skill:
+
+```text
+$create-mr
+$review-mr https://github.com/OWNER/REPO/pull/123
+$resolve-mr
+$feature-brainstorm Help me shape a new feature.
+Tell me a joke about vegetables.
+```
+
+Natural-language requests work too, for example "use create-mr to open a PR for this branch." Do not rely on `/create-mr` in Codex; slash-prefixed input can be intercepted by the client as a built-in command.
+
+In Claude Code, global skills can be triggered by asking to use the skill by name. If you install the Bobkit Claude plugin, use the namespaced plugin commands shown below.
+
 For contributors working from a checkout:
 
 ```bash

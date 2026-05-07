@@ -1,6 +1,6 @@
 ---
 name: create-mr
-description: Create a merge request or pull request for the current git branch. Use when the user asks to create an MR, merge request, PR, pull request, or invokes /create-mr.
+description: Create a merge request or pull request for the current git branch. Use when the user asks to create an MR, merge request, PR, pull request, or explicitly names create-mr / $create-mr.
 targets: ["*"]
 codexcli:
   short-description: Create a GitLab MR or GitHub PR
@@ -11,6 +11,10 @@ copilot:
 # Create MR
 
 Create a merge request or pull request for the current git repository. Prefer doing the work directly with the repository's native CLI after verifying the host.
+
+## Invocation
+
+Trigger this skill by naming it (`$create-mr` in Codex) or with a natural-language request such as "use create-mr to open a PR". Do not rely on un-namespaced `/create-mr`; some clients reserve slash-prefixed input for built-in commands.
 
 ## Workflow
 

@@ -24,7 +24,7 @@ tests:
   - description: Create MR contract includes host detection and CLI fallback
     vars:
       skill_name: create-mr
-      request: /create-mr
+      request: $create-mr
       expected_contract: >-
         The create-mr skill should detect GitHub or GitLab from remotes, use gh
         for GitHub and glab for GitLab, ask the user to install missing CLIs or
@@ -60,7 +60,7 @@ tests:
   - description: Review MR contract includes hosted PR/MR review posting
     vars:
       skill_name: review-mr
-      request: /review-mr https://github.com/example/repo/pull/123
+      request: $review-mr https://github.com/example/repo/pull/123
       expected_contract: >-
         The review-mr skill should require an MR or PR URL, detect GitHub or
         GitLab from the URL including self-hosted hostnames, verify gh or glab
@@ -99,7 +99,7 @@ tests:
   - description: Resolve MR contract includes thread fetch, judgment buckets, and reply+resolve flow
     vars:
       skill_name: resolve-mr
-      request: /resolve-mr
+      request: $resolve-mr
       expected_contract: >-
         The resolve-mr skill should accept an optional MR or PR URL or detect
         the open request for the current branch via gh pr list or glab mr list,
