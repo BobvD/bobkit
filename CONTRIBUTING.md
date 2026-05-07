@@ -69,6 +69,7 @@ bobkit update --dev
 | Generate skills for all targets | `npm run rulesync:generate` |
 | Check generated output is fresh | `npm run rulesync:check` |
 | Run prompt evals | `npm run eval` |
+| Run Claude behavior evals | `npm run eval:claude` |
 | Build Claude plugin + marketplace artifacts | `npm run build:claude` |
 | Build npm package assets | `npm run build:package` |
 | Run CI-equivalent checks | `npm run ci` |
@@ -98,6 +99,27 @@ npm run eval
 ```
 
 `npm run ci` currently runs the Claude plugin build and prompt evals. Package-specific checks are separate because they validate npm tarball contents.
+
+## Claude Behavior Evals
+
+`npm run eval` is the default free smoke suite. It uses Promptfoo's `echo` provider to verify that every skill has a stable contract test.
+
+`npm run eval:claude` is an opt-in behavior suite that sends each source skill to Claude through Promptfoo's Anthropic provider. It loads the real `.rulesync/skills/<skill>/SKILL.md`, applies a simulated environment, and checks the response with JavaScript assertions. Keep it out of `npm run ci` unless the repository is ready for paid/provider-backed evals on every CI run.
+
+Authenticate one of two ways:
+
+```bash
+export ANTHROPIC_API_KEY=...
+```
+
+Or log in through Claude Code and let Promptfoo reuse that credential:
+
+```bash
+claude /login
+npm run eval:claude
+```
+
+The Claude eval config sets `apiKeyRequired: false` so a Claude Code session can be used without a separate Anthropic Console key.
 
 ## Claude Plugin Testing
 
