@@ -57,6 +57,45 @@ tests:
         value: conversation context
       - type: contains
         value: --body-file
+  - description: Review MR contract includes hosted PR/MR review posting
+    vars:
+      skill_name: review-mr
+      request: /review-mr https://github.com/example/repo/pull/123
+      expected_contract: >-
+        The review-mr skill should require an MR or PR URL, detect GitHub or
+        GitLab from the URL including self-hosted hostnames, verify gh or glab
+        installation and authentication for that hostname, fetch metadata and
+        diff with the native CLI, review only lines introduced by this MR/PR,
+        produce severity-tagged inline findings with suggestion blocks and AI
+        attribution, build host-specific payload file(s), submit comments
+        immediately, approve only when there are zero findings and the user
+        explicitly asked for approval, continue after per-finding GitLab post
+        failures, and report the review URL, severity counts, and failed posts.
+    assert:
+      - type: contains
+        value: review-mr
+      - type: contains
+        value: GitHub or GitLab
+      - type: contains
+        value: self-hosted hostnames
+      - type: contains
+        value: gh
+      - type: contains
+        value: glab
+      - type: contains
+        value: lines introduced by this MR/PR
+      - type: contains
+        value: severity-tagged
+      - type: contains
+        value: suggestion blocks
+      - type: contains
+        value: AI attribution
+      - type: contains
+        value: host-specific payload
+      - type: contains
+        value: approve only
+      - type: contains
+        value: failed posts
   - description: Feature brainstorm contract includes gated spec-and-plan workflow
     vars:
       skill_name: feature-brainstorm
