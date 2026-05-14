@@ -68,18 +68,17 @@ After the approach is chosen, make the implementation shape explicit:
 
 Use ASCII diagrams for non-trivial flows or state machines. If the feature touches UI, identify reusable design-system pieces before proposing new components.
 
-### 5. Final Spec And Plan
+### 5. Hand off to `write-spec`
 
-Present the final output in a `<proposed_plan>` block when the host supports it. Keep it concise but decision-complete:
+Once the product approach and engineering shape are locked in, do not produce the final spec inline. Invoke the `write-spec` skill and pass it the locked-in decisions as input:
 
-- Title and summary.
-- User-facing behavior and success criteria.
-- Public API, type, schema, route, or interface changes.
-- Implementation changes grouped by subsystem.
-- Test scenarios and acceptance criteria.
-- Assumptions, defaults chosen, and explicit non-goals.
+- Feature title and one-line summary.
+- The problem, audience, outcome, success criteria, and non-goals from step 2.
+- The chosen approach from step 3.
+- The interfaces, data flow, edge cases, testing, and rollout decisions from step 4. These become the spec's **Implementation Notes** section so an implementing AI agent does not re-litigate them.
+- Any assumptions or defaults you chose without explicit user input.
 
-Do not ask "should I proceed?" in the final output. The user can request implementation after reviewing the plan.
+`write-spec` writes the spec file and reports the path plus the BDD handoff line. The brainstorm skill's job ends with the handoff — do not re-state what `write-spec` already reported, and do not ask "should I proceed?". The user can request implementation (or `$write-bdd`) after reviewing the spec.
 
 ## Common Failure Modes
 
