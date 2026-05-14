@@ -53,9 +53,10 @@ If the repo has no BDD framework at all:
 
 ### 4. Generate the `.feature` file(s)
 
-For each User Story in the spec (or each top-level capability in a freeform description):
+Default to **one `.feature` file per spec**, containing one `Scenario:` per Acceptance Scenario across all User Stories. Multiple `Scenario:` blocks inside a single `Feature:` is idiomatic Gherkin, avoids filename collisions, and lets `@P1`/`@P2`/`@P3` tags filter subsets at run time.
 
-- Create one `<feature-slug>.feature` file. Place it in the detected feature directory (e.g., `tests/features/login-with-clerk.feature`).
+- File name: `<feature-slug>.feature` (kebab-case from the spec title, e.g., `tests/features/login-with-clerk.feature`).
+- If the spec is large enough that the resulting file exceeds ~200 lines, split it into `<feature-slug>-<story-slug>.feature` per User Story. Never write multiple stories to the same filename in a single run.
 - Use standard Gherkin syntax compatible with both Cucumber.js and playwright-bdd:
 
 ```gherkin

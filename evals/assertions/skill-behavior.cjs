@@ -182,15 +182,17 @@ module.exports.writeSpec = (output) =>
     },
     (result) => {
       const body = text(result);
-      return /P1|P2|P3/.test(body)
+      return /Priority:\s*P1\b/.test(body)
         ? null
-        : 'write-spec should tag User Stories with P1/P2/P3 priorities';
+        : 'write-spec should tag at least one User Story with "Priority: P1"';
     },
     (result) => {
       const body = lowerText(result);
-      return body.includes('spec-kit') || body.includes('spec kit') || body.includes('github')
+      const hasFullSlug = body.includes('github/spec-kit');
+      const hasSpecKitAndMit = body.includes('spec-kit') && body.includes('mit');
+      return hasFullSlug || hasSpecKitAndMit
         ? null
-        : 'write-spec output should preserve attribution to github/spec-kit';
+        : 'write-spec output should preserve attribution to github/spec-kit (require "github/spec-kit" or both "spec-kit" and "mit")';
     },
     (result) => {
       const body = lowerText(result);

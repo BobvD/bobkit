@@ -70,9 +70,7 @@ Use ASCII diagrams for non-trivial flows or state machines. If the feature touch
 
 ### 5. Hand off to `write-spec`
 
-Once the product approach and engineering shape are locked in, do not produce the final spec inline. Hand off to the `write-spec` skill, which formats the decisions into a Spec Kit-shaped feature specification document on disk.
-
-Pass the following to `write-spec` as input:
+Once the product approach and engineering shape are locked in, do not produce the final spec inline. Invoke the `write-spec` skill and pass it the locked-in decisions as input:
 
 - Feature title and one-line summary.
 - The problem, audience, outcome, success criteria, and non-goals from step 2.
@@ -80,7 +78,7 @@ Pass the following to `write-spec` as input:
 - The interfaces, data flow, edge cases, testing, and rollout decisions from step 4. These become the spec's **Implementation Notes** section so an implementing AI agent does not re-litigate them.
 - Any assumptions or defaults you chose without explicit user input.
 
-After `write-spec` finishes, report the path it wrote and the BDD handoff line it produced. Do not ask "should I proceed?" in the final output. The user can request implementation (or `$write-bdd`) after reviewing the spec.
+`write-spec` writes the spec file and reports the path plus the BDD handoff line. The brainstorm skill's job ends with the handoff — do not re-state what `write-spec` already reported, and do not ask "should I proceed?". The user can request implementation (or `$write-bdd`) after reviewing the spec.
 
 ## Common Failure Modes
 
