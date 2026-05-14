@@ -230,9 +230,9 @@ module.exports.writeConstitutionNew = (output) =>
         'Dependencies Earn Their Place',
       ];
       const present = defaults.filter((d) => body.includes(d)).length;
-      return present >= 3
+      return present === defaults.length
         ? null
-        : `write-constitution should propose indie default principles (saw ${present}/5 names)`;
+        : `write-constitution should propose all indie default principles (saw ${present}/${defaults.length} names)`;
     },
     (result) =>
       behavior(result).asked_for_user_decision === true

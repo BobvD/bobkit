@@ -33,7 +33,7 @@ This skill is also invoked as the final step of `feature-brainstorm`, which pass
 
 Pick one of three paths based on `.bobkit/constitution.md`:
 
-- **File missing** → tell the user a constitution would shape this spec and offer to invoke `$write-constitution` now. If the user accepts, do that first, then return. If the user declines, ask `write-constitution` to write a declined stub so the prompt does not repeat for 90 days, then continue.
+- **File missing** → tell the user a constitution would shape this spec and offer to invoke `$write-constitution` now. If the user accepts, invoke `$write-constitution` first, then resume this spec with the new constitution loaded. If the user declines, ask `write-constitution` to write a declined stub so the prompt does not repeat for 90 days, then continue.
 - **File is a declined stub** (contains `<!-- declined: YYYY-MM-DD -->` and no `## Core Principles` body content). Parse the date. If it is older than 90 days, ask once more. If still declined, refresh the stub date and continue. If within 90 days, silently skip the prompt.
 - **File is a real constitution** → load it. When you fill the spec, surface relevant principles by Roman-numeral name in the **Implementation Notes** section (e.g., `"Aligns with I. Smallest Useful Slice — defers OAuth providers beyond email to a v2"`). If a Functional Requirement or Acceptance Scenario conflicts with a principle, mark it `[NEEDS CLARIFICATION: conflicts with Principle X — confirm exception]` rather than silently violating it.
 
