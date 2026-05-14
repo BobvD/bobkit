@@ -84,12 +84,70 @@ tests:
         - Next.js App Router project with TypeScript.
         - No specs/ directory exists yet.
         - No auth currently wired up.
+        - .bobkit/constitution.md exists with the following content (declined stub, fresh — within 90-day window, so constitution prompt should be silently skipped):
+
+          # Constitution
+
+          _None set. Run `$write-constitution` to add project principles._
+
+          <!-- declined: 2026-04-20 -->
+
+        - Today's date is 2026-05-14 (24 days after the declined date).
         - Locked-in decisions from prior brainstorm: use @clerk/nextjs v5, Clerk's
           pre-built <SignIn /> and <SignUp /> widgets, clerkMiddleware() for route
           protection, email/password + Google OAuth only, no MFA, no org/teams.
     assert:
       - type: javascript
         value: file://evals/assertions/skill-behavior.cjs:writeSpec
+
+  - description: Write Constitution proposes indie defaults and writes to .bobkit
+    vars:
+      skill_name: write-constitution
+      request: $write-constitution for this project
+      scenario: |-
+        Repository context already inspected:
+        - Solo indie project, TypeScript Next.js app.
+        - No .bobkit/ directory or constitution.md exists.
+        - package.json name is "myapp".
+        - Today's date is 2026-05-14.
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:writeConstitutionNew
+
+  - description: Write Spec nudges to create a constitution when none exists
+    vars:
+      skill_name: write-spec
+      request: $write-spec for adding a CSV export to the dashboard
+      scenario: |-
+        Repository context already inspected:
+        - Next.js TypeScript app.
+        - No .bobkit/ directory, no constitution.md.
+        - specs/ directory does not exist yet.
+        - Today's date is 2026-05-14.
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:writeSpecConstitutionMissing
+
+  - description: Write Spec silently skips constitution prompt when declined stub is fresh
+    vars:
+      skill_name: write-spec
+      request: $write-spec for adding a CSV export to the dashboard
+      scenario: |-
+        Repository context already inspected:
+        - Next.js TypeScript app.
+        - .bobkit/constitution.md exists with the following content (no Core Principles, declined stub):
+
+          # Constitution
+
+          _None set. Run `$write-constitution` to add project principles._
+
+          <!-- declined: 2026-04-01 -->
+
+        - specs/ directory does not exist yet.
+        - Today's date is 2026-05-14 (44 days after the declined date — within the 90-day window).
+    assert:
+      - type: javascript
+        value: file://evals/assertions/skill-behavior.cjs:writeSpecConstitutionStubFresh
 
   - description: Write BDD asks before installing playwright-bdd when no framework exists
     vars:

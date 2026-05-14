@@ -25,6 +25,7 @@ Restart any open agent sessions after installing so they reload available skills
 In Codex, call a skill by naming it:
 
 ```text
+$write-constitution to set this project's principles.
 $feature-brainstorm Help me shape a new onboarding feature.
 $write-spec for adding email/password login with Clerk.
 $write-bdd for the login-with-clerk spec.
@@ -54,6 +55,7 @@ claude plugin install bobkit@bobkit-marketplace --scope project
 Then in Claude Code:
 
 ```text
+/bobkit:write-constitution
 /bobkit:create-mr
 /bobkit:review-mr https://github.com/OWNER/REPO/pull/123
 /bobkit:resolve-mr
@@ -67,8 +69,9 @@ Then in Claude Code:
 
 | Skill | Use It For | What It Does |
 | --- | --- | --- |
-| `feature-brainstorm` | Turning a rough product idea into a buildable spec. | Scans the repo context, challenges the requirement, compares approaches, locks in engineering decisions, and hands off to `write-spec` for the final spec document. |
-| `write-spec` | Writing a feature specification document. | Produces a spec on disk using GitHub Spec Kit's `spec-template.md` (User Scenarios with P1/P2/P3, Functional Requirements, Success Criteria, Assumptions) plus an Implementation Notes section for locked-in architectural decisions. Suggests `write-bdd` as the next step. |
+| `write-constitution` | Setting durable project principles that shape every later feature. | Writes `.bobkit/constitution.md` using GitHub Spec Kit's `constitution-template.md`, with indie-flavored default principles the user can keep or replace. `feature-brainstorm` and `write-spec` read this file and surface relevant principles. |
+| `feature-brainstorm` | Turning a rough product idea into a buildable spec. | Scans the repo context (including the constitution, if any), challenges the requirement, compares approaches, locks in engineering decisions, and hands off to `write-spec` for the final spec document. |
+| `write-spec` | Writing a feature specification document. | Produces a spec on disk using GitHub Spec Kit's `spec-template.md` (User Scenarios with P1/P2/P3, Functional Requirements, Success Criteria, Assumptions) plus an Implementation Notes section for locked-in architectural decisions. Loads the constitution (if any) and flags principle conflicts. Suggests `write-bdd` as the next step. |
 | `write-bdd` | Turning acceptance scenarios into runnable BDD tests. | Detects the project's BDD/test framework, generates Gherkin `.feature` files and step-definition stubs from a spec, and asks before installing `playwright-bdd` when no framework is present. Generation only — does not run tests. |
 | `create-mr` | Opening a pull request or merge request for the current branch. | Detects GitHub or GitLab, checks the native CLI and auth, summarizes the branch diff, pushes when appropriate, and opens the request. |
 | `review-mr` | Reviewing a GitHub pull request or GitLab merge request. | Fetches metadata and diff context, reviews only changed lines, and posts concrete inline findings with severity labels. |

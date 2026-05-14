@@ -206,6 +206,85 @@ module.exports.writeSpec = (output) =>
         : 'write-spec should not run provider CLIs',
   ]);
 
+module.exports.writeConstitutionNew = (output) =>
+  evaluate(output, [
+    (result) => {
+      const body = text(result);
+      return body.includes('.bobkit/constitution.md') || body.includes('.bobkit/')
+        ? null
+        : 'write-constitution should target .bobkit/constitution.md';
+    },
+    (result) => {
+      const body = lowerText(result);
+      return !body.includes('.specify/')
+        ? null
+        : 'write-constitution should not use the .specify/ path';
+    },
+    (result) => {
+      const body = text(result);
+      const defaults = [
+        'Smallest Useful Slice',
+        'Validate Before Scale',
+        'AI-Readable Code',
+        'Tests Where They Pay',
+        'Dependencies Earn Their Place',
+      ];
+      const present = defaults.filter((d) => body.includes(d)).length;
+      return present === defaults.length
+        ? null
+        : `write-constitution should propose all indie default principles (saw ${present}/${defaults.length} names)`;
+    },
+    (result) =>
+      behavior(result).asked_for_user_decision === true
+        ? null
+        : 'write-constitution should ask the user which principles to keep before writing the file',
+    (result) =>
+      behavior(result).would_modify_files === false
+        ? null
+        : 'write-constitution should wait for user confirmation on principles before writing',
+  ]);
+
+module.exports.writeSpecConstitutionMissing = (output) =>
+  evaluate(output, [
+    (result) => {
+      const body = lowerText(result);
+      return body.includes('constitution')
+        ? null
+        : 'write-spec should mention the constitution when none exists';
+    },
+    (result) => {
+      const body = lowerText(result);
+      return body.includes('write-constitution') || body.includes('$write-constitution')
+        ? null
+        : 'write-spec should offer to invoke write-constitution';
+    },
+    (result) =>
+      behavior(result).asked_for_user_decision === true
+        ? null
+        : 'write-spec should ask the user a decision (create constitution vs decline) before proceeding',
+  ]);
+
+module.exports.writeSpecConstitutionStubFresh = (output) =>
+  evaluate(output, [
+    (result) => {
+      const body = lowerText(result);
+      const offered =
+        body.includes('want to create a constitution') ||
+        body.includes('offer to invoke') ||
+        body.includes('create one now') ||
+        (body.includes('write-constitution') && body.includes('?'));
+      return !offered
+        ? null
+        : 'write-spec should not re-prompt for a constitution when the declined stub is within the 90-day window';
+    },
+    (result) => {
+      const body = text(result);
+      return body.includes('Feature Specification') || body.includes('User Scenarios') || body.includes('Functional Requirements') || lowerText(result).includes('csv')
+        ? null
+        : 'write-spec should proceed with spec drafting when the declined stub is fresh';
+    },
+  ]);
+
 module.exports.writeBddNoFramework = (output) =>
   evaluate(output, [
     (result) => {
