@@ -142,7 +142,7 @@ tests:
         value: never approve
       - type: contains
         value: counts by outcome
-  - description: Feature brainstorm contract includes gated spec-and-plan workflow
+  - description: Feature brainstorm contract includes gated workflow and write-spec handoff
     vars:
       skill_name: feature-brainstorm
       request: Help me brainstorm a new feature before we build it.
@@ -150,8 +150,9 @@ tests:
         The feature-brainstorm skill should ground in the environment before
         asking questions, avoid implementation during brainstorming, present 2-3
         approaches with tradeoffs, ask concrete multiple-choice decisions when
-        useful, and end with a decision-complete spec and implementation-ready
-        plan.
+        useful, and end by handing off the locked-in product and engineering
+        decisions to the write-spec skill to produce a decision-complete feature
+        specification on disk.
     assert:
       - type: contains
         value: feature-brainstorm
@@ -160,4 +161,76 @@ tests:
       - type: contains
         value: avoid implementation
       - type: contains
-        value: decision-complete spec
+        value: write-spec
+      - type: contains
+        value: decision-complete
+  - description: Write spec contract includes Spec Kit template and BDD handoff
+    vars:
+      skill_name: write-spec
+      request: $write-spec for login with Clerk
+      expected_contract: >-
+        The write-spec skill should produce a feature specification document
+        using the spec-template from GitHub Spec Kit, detect or create the
+        specs/ directory, write User Scenarios with P1/P2/P3 priorities,
+        Functional Requirements, Success Criteria, Assumptions, and an
+        Implementation Notes section for locked-in architectural decisions,
+        mark unclear requirements as NEEDS CLARIFICATION rather than guessing,
+        preserve the MIT attribution to github/spec-kit, never overwrite an
+        existing spec without asking, never run code or edit unrelated files,
+        and end by suggesting $write-bdd for runnable BDD scenarios.
+    assert:
+      - type: contains
+        value: write-spec
+      - type: contains
+        value: spec-template
+      - type: contains
+        value: GitHub Spec Kit
+      - type: contains
+        value: User Scenarios
+      - type: contains
+        value: P1/P2/P3
+      - type: contains
+        value: Functional Requirements
+      - type: contains
+        value: Success Criteria
+      - type: contains
+        value: Implementation Notes
+      - type: contains
+        value: NEEDS CLARIFICATION
+      - type: contains
+        value: MIT attribution
+      - type: contains
+        value: $write-bdd
+  - description: Write BDD contract includes framework detection and generation-only scope
+    vars:
+      skill_name: write-bdd
+      request: $write-bdd for the login-with-clerk spec
+      expected_contract: >-
+        The write-bdd skill should accept a spec path or freeform feature
+        description, detect the existing BDD or test framework from
+        package.json and test directories, suggest installing playwright-bdd
+        when no framework is present and ask before installing, generate
+        Gherkin .feature files with one scenario per acceptance scenario
+        tagged @P1/@P2/@P3, emit step definition stubs that fail by default
+        in the project's existing language and module style, match the
+        repo's existing test directory convention, never run the generated
+        tests, never edit the source spec, never install dependencies
+        without confirmation, and report the files created with the run
+        command for the detected framework.
+    assert:
+      - type: contains
+        value: write-bdd
+      - type: contains
+        value: playwright-bdd
+      - type: contains
+        value: ask before installing
+      - type: contains
+        value: .feature
+      - type: contains
+        value: step definition
+      - type: contains
+        value: fail by default
+      - type: contains
+        value: never run
+      - type: contains
+        value: report the files created

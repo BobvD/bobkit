@@ -26,6 +26,8 @@ In Codex, call a skill by naming it:
 
 ```text
 $feature-brainstorm Help me shape a new onboarding feature.
+$write-spec for adding email/password login with Clerk.
+$write-bdd for the login-with-clerk spec.
 $create-mr
 $review-mr https://github.com/OWNER/REPO/pull/123
 $resolve-mr https://github.com/OWNER/REPO/pull/123
@@ -56,6 +58,8 @@ Then in Claude Code:
 /bobkit:review-mr https://github.com/OWNER/REPO/pull/123
 /bobkit:resolve-mr
 /bobkit:feature-brainstorm
+/bobkit:write-spec
+/bobkit:write-bdd
 /bobkit:vegetable-joke
 ```
 
@@ -63,7 +67,9 @@ Then in Claude Code:
 
 | Skill | Use It For | What It Does |
 | --- | --- | --- |
-| `feature-brainstorm` | Turning a rough product idea into a buildable plan. | Scans the repo context, challenges the requirement, compares approaches, and ends with an implementation-ready spec. |
+| `feature-brainstorm` | Turning a rough product idea into a buildable spec. | Scans the repo context, challenges the requirement, compares approaches, locks in engineering decisions, and hands off to `write-spec` for the final spec document. |
+| `write-spec` | Writing a feature specification document. | Produces a spec on disk using GitHub Spec Kit's `spec-template.md` (User Scenarios with P1/P2/P3, Functional Requirements, Success Criteria, Assumptions) plus an Implementation Notes section for locked-in architectural decisions. Suggests `write-bdd` as the next step. |
+| `write-bdd` | Turning acceptance scenarios into runnable BDD tests. | Detects the project's BDD/test framework, generates Gherkin `.feature` files and step-definition stubs from a spec, and asks before installing `playwright-bdd` when no framework is present. Generation only — does not run tests. |
 | `create-mr` | Opening a pull request or merge request for the current branch. | Detects GitHub or GitLab, checks the native CLI and auth, summarizes the branch diff, pushes when appropriate, and opens the request. |
 | `review-mr` | Reviewing a GitHub pull request or GitLab merge request. | Fetches metadata and diff context, reviews only changed lines, and posts concrete inline findings with severity labels. |
 | `resolve-mr` | Working through open review comments. | Fetches unresolved threads, classifies each comment, applies scoped fixes, commits, replies, and resolves completed threads. |

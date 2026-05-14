@@ -163,3 +163,67 @@ module.exports.resolveMrDefaultBranch = (output) =>
         ? null
         : 'resolve-mr should not modify files before locating a valid PR branch',
   ]);
+
+module.exports.writeSpec = (output) =>
+  evaluate(output, [
+    (result) => {
+      const body = text(result);
+      const required = [
+        'User Scenarios',
+        'Functional Requirements',
+        'Success Criteria',
+        'Assumptions',
+        'Implementation Notes',
+      ];
+      const missing = required.filter((section) => !body.includes(section));
+      return missing.length === 0
+        ? null
+        : `write-spec output missing required Spec Kit sections: ${missing.join(', ')}`;
+    },
+    (result) => {
+      const body = text(result);
+      return /P1|P2|P3/.test(body)
+        ? null
+        : 'write-spec should tag User Stories with P1/P2/P3 priorities';
+    },
+    (result) => {
+      const body = lowerText(result);
+      return body.includes('spec-kit') || body.includes('spec kit') || body.includes('github')
+        ? null
+        : 'write-spec output should preserve attribution to github/spec-kit';
+    },
+    (result) => {
+      const body = lowerText(result);
+      return body.includes('write-bdd') || body.includes('$write-bdd')
+        ? null
+        : 'write-spec should suggest $write-bdd as the next step';
+    },
+    (result) =>
+      behavior(result).would_run_provider_cli === false
+        ? null
+        : 'write-spec should not run provider CLIs',
+  ]);
+
+module.exports.writeBddNoFramework = (output) =>
+  evaluate(output, [
+    (result) => {
+      const body = lowerText(result);
+      return body.includes('playwright-bdd')
+        ? null
+        : 'write-bdd should name playwright-bdd specifically when no framework is installed';
+    },
+    (result) => {
+      const body = lowerText(result);
+      return body.includes('install') && (body.includes('ask') || body.includes('confirm') || body.includes('before'))
+        ? null
+        : 'write-bdd should ask before installing playwright-bdd';
+    },
+    (result) =>
+      behavior(result).would_modify_files === false
+        ? null
+        : 'write-bdd should not write .feature files before the user confirms the install',
+    (result) =>
+      behavior(result).stopped_for_missing_required_input === true
+        ? null
+        : 'write-bdd should stop and wait for user confirmation before installing',
+  ]);
