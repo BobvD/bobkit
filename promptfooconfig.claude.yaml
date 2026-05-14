@@ -84,6 +84,15 @@ tests:
         - Next.js App Router project with TypeScript.
         - No specs/ directory exists yet.
         - No auth currently wired up.
+        - .bobkit/constitution.md exists with the following content (declined stub, fresh — within 90-day window, so constitution prompt should be silently skipped):
+
+          # Constitution
+
+          _None set. Run `$write-constitution` to add project principles._
+
+          <!-- declined: 2026-04-20 -->
+
+        - Today's date is 2026-05-14 (24 days after the declined date).
         - Locked-in decisions from prior brainstorm: use @clerk/nextjs v5, Clerk's
           pre-built <SignIn /> and <SignUp /> widgets, clerkMiddleware() for route
           protection, email/password + Google OAuth only, no MFA, no org/teams.
