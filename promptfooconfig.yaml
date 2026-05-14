@@ -201,6 +201,49 @@ tests:
         value: MIT attribution
       - type: contains
         value: $write-bdd
+  - description: Write Constitution contract includes Spec Kit template and declined-stub mechanism
+    vars:
+      skill_name: write-constitution
+      request: $write-constitution
+      expected_contract: >-
+        The write-constitution skill should write the constitution to
+        .bobkit/constitution.md (not .specify/), borrow the Spec Kit
+        constitution-template.md verbatim with MIT attribution to
+        github/spec-kit, offer indie-flavored default principles
+        (Smallest Useful Slice, Validate Before Scale, AI-Readable Code,
+        Tests Where They Pay, Dependencies Earn Their Place) that the
+        user can keep edit or replace, support Section 2 and Section 3
+        as optional, default Governance text for solo projects, follow
+        semantic versioning rules for MAJOR MINOR PATCH bumps on
+        amendments, write a declined stub with a <!-- declined: YYYY-MM-DD -->
+        marker when invoked in offer mode and the user declines, detect
+        and replace a declined stub when the user later opts in, and
+        never overwrite a real constitution without explicit confirmation.
+    assert:
+      - type: contains
+        value: write-constitution
+      - type: contains
+        value: .bobkit/constitution.md
+      - type: contains
+        value: constitution-template.md
+      - type: contains
+        value: github/spec-kit
+      - type: contains
+        value: MIT attribution
+      - type: contains
+        value: Smallest Useful Slice
+      - type: contains
+        value: AI-Readable Code
+      - type: contains
+        value: Tests Where They Pay
+      - type: contains
+        value: Dependencies Earn Their Place
+      - type: contains
+        value: declined stub
+      - type: contains
+        value: "<!-- declined: YYYY-MM-DD -->"
+      - type: contains
+        value: semantic versioning
   - description: Write BDD contract includes framework detection and generation-only scope
     vars:
       skill_name: write-bdd

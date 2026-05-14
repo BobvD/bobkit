@@ -26,7 +26,18 @@ This skill is also invoked as the final step of `feature-brainstorm`, which pass
 
 - Read the user's feature description, any prior brainstorm output, and any locked-in decisions passed in.
 - Inspect repo conventions briefly: existing `specs/` or `docs/` directories, naming patterns, similar feature docs. Match what the repo already does.
+- Read `.bobkit/constitution.md` using the constitution check below.
 - If the feature description is too vague to produce a useful spec (no problem, no audience, no success signal), ask one focused clarifying question before continuing. Do not invent product decisions.
+
+#### Constitution check
+
+Pick one of three paths based on `.bobkit/constitution.md`:
+
+- **File missing** → tell the user a constitution would shape this spec and offer to invoke `$write-constitution` now. If the user accepts, do that first, then return. If the user declines, ask `write-constitution` to write a declined stub so the prompt does not repeat for 90 days, then continue.
+- **File is a declined stub** (contains `<!-- declined: YYYY-MM-DD -->` and no `## Core Principles` body content). Parse the date. If it is older than 90 days, ask once more. If still declined, refresh the stub date and continue. If within 90 days, silently skip the prompt.
+- **File is a real constitution** → load it. When you fill the spec, surface relevant principles by Roman-numeral name in the **Implementation Notes** section (e.g., `"Aligns with I. Smallest Useful Slice — defers OAuth providers beyond email to a v2"`). If a Functional Requirement or Acceptance Scenario conflicts with a principle, mark it `[NEEDS CLARIFICATION: conflicts with Principle X — confirm exception]` rather than silently violating it.
+
+Do not block the spec on a missing constitution. The check is a nudge, not a gate.
 
 ### 2. Choose the spec location
 

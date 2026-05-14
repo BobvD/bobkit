@@ -30,8 +30,19 @@ Before product questions, inspect likely sources of truth:
 - Existing feature docs, README, architecture notes, tickets, or plans.
 - Similar modules, routes, APIs, components, data models, and tests.
 - Project conventions for planning, testing, migrations, UI, release, and generated files.
+- The project constitution at `.bobkit/constitution.md`, using the rules below.
 
 Summarize what the repo already tells you. Identify only the remaining decisions that need the user.
+
+#### Constitution check
+
+Read `.bobkit/constitution.md` and pick one of three paths:
+
+- **File missing** → tell the user a constitution would shape this brainstorm and offer to invoke `$write-constitution` now. If the user accepts, do that first, then return. If the user declines, ask `write-constitution` to write a declined stub (so this prompt does not repeat for 90 days) and continue without a constitution.
+- **File is a declined stub** (contains `<!-- declined: YYYY-MM-DD -->` and no `## Core Principles` content with body text). Parse the date. If it is **older than 90 days**, ask once more whether to create a constitution. If still declined, refresh the stub date and continue. If the date is within 90 days, silently skip the prompt and continue.
+- **File is a real constitution** → load it. In later steps, when you propose approaches or lock in decisions, name the relevant principles by their Roman-numeral heading (e.g., "This aligns with **I. Smallest Useful Slice**") and flag any tradeoff that conflicts with a principle so the user can confirm the exception.
+
+Do not block the brainstorm on a missing constitution. The check is a nudge, not a gate.
 
 ### 2. Product Challenge
 
