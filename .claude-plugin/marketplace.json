@@ -1,0 +1,30 @@
+{
+  "name": "bobkit-marketplace",
+  "description": "Bobkit Claude Code marketplace generated from Rulesync-managed skills.",
+  "owner": {
+    "name": "Bob van Donselaar",
+    "email": "bobvandonselaar@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "bobkit",
+      "source": "./plugins/bobkit",
+      "description": "Bobkit Claude Code plugin spike with Rulesync-managed skills and Promptfoo evals.",
+      "author": {
+        "name": "Bob van Donselaar",
+        "email": "bobvandonselaar@gmail.com"
+      },
+      "homepage": "https://github.com/BobvD/bobkit",
+      "repository": "https://github.com/BobvD/bobkit",
+      "license": "MIT",
+      "category": "workflow",
+      "tags": [
+        "ai-coding",
+        "claude-code",
+        "promptfoo",
+        "rulesync",
+        "skills"
+      ]
+    }
+  ]
+}
