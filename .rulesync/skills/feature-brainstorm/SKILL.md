@@ -16,7 +16,8 @@ Turn a rough feature idea into an approved product spec and implementation-ready
 
 - Ground in the environment before asking questions: inspect repo structure, docs, related features, conventions, and tests when available.
 - Ask only questions that materially affect the spec or plan. Do not ask for facts the repo can answer.
-- Prefer one decision at a time. Use multiple choice when practical, with a recommended option and short tradeoff descriptions.
+- Default to surfacing decisions as an interactive multiple-choice menu rather than a wall of prose questions. In Claude Code, use the `AskUserQuestion` tool; in other harnesses, use the equivalent structured-choice prompt. Each question gets 2-4 concrete options, the recommended one listed first and labeled `(Recommended)`, with a one-line tradeoff per option. The harness adds an "Other" free-type choice automatically — it does not count toward the 2-4 — so you do not need to supply an open-ended fallback. But when you genuinely cannot predict a sensible option set (e.g. naming, or framing the core problem), a single open question beats fabricated choices.
+- Keep each menu focused on closely related decisions. Use the current harness structured-choice limit to batch a tight cluster, but do not pad it with low-value questions just to fill slots. When a later decision depends on an earlier answer, ask in sequence instead.
 - Never silently change scope. Add, defer, or remove scope only after making the tradeoff explicit.
 - Present 2-3 viable approaches before committing to one, even when one is clearly best.
 - End with a decision-complete spec and plan. The implementer should not need to make product or architecture decisions.
@@ -57,15 +58,17 @@ Clarify the feature until these are explicit:
 
 For startup or customer-facing ideas, push for demand reality: current workaround, urgency, narrowest first user, and evidence. For internal, developer, hobby, or open source ideas, push for usefulness, learning value, maintainability, and the smallest satisfying version.
 
+Ask these as menus, not prose. For each open point, offer the most likely answers as options (with your recommended option first) so the user confirms with a click instead of typing a paragraph.
+
 ### 3. Approach Selection
 
-Offer 2-3 approaches with a recommendation:
+Offer 2-3 approaches with a recommendation, presented as a single menu so the user picks one:
 
 - Minimal: smallest useful version.
 - Balanced: practical default that handles the core use case well.
 - Ambitious: broader version if the extra scope clearly improves the product.
 
-For each approach, state what it includes, what it skips, main risks, effort, and why you recommend or reject it. Ask the user to choose before treating an approach as accepted.
+Make each approach one menu option, recommended one first and labeled `(Recommended)`. In the option description state what it includes, what it skips, main risks, and effort; when the breakdown is detailed, put it in the option's `preview` field for a side-by-side comparison so the labels stay scannable. Ask the user to choose before treating an approach as accepted.
 
 ### 4. Engineering Lock-In
 
@@ -94,6 +97,7 @@ Once the product approach and engineering shape are locked in, do not produce th
 ## Common Failure Modes
 
 - Jumping to implementation before the problem and success criteria are clear.
+- Dumping several questions as plain text instead of an interactive multiple-choice menu with recommended options.
 - Asking broad open-ended questions when a concrete multiple-choice decision would be faster.
 - Proposing only the recommended solution and hiding tradeoffs.
 - Writing a plan that says "handle errors" without naming the actual errors.
