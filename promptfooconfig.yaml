@@ -277,3 +277,41 @@ tests:
         value: never run
       - type: contains
         value: report the files created
+  - description: Design explore contract includes design-system detection, HTML options, and BDD handoff
+    vars:
+      skill_name: design-explore
+      request: $design-explore options for the onboarding screen
+      expected_contract: >-
+        The design-explore skill should run only for UI-facing features, detect
+        the repo's design system (shadcn, Tailwind, CSS variables, component
+        library) and tokens before asking anything, ask design intent as
+        interactive multiple-choice menus rather than prose, generate 3-5
+        genuinely distinct options in one self-contained HTML file beside the
+        spec using the detected tokens, meet WCAG 2.2 AA contrast, semantic and
+        accessible HTML, responsive viewport, SEO head tags, and performance
+        standards for a clean Lighthouse score, present the file by path instead
+        of pasting HTML, get multiple-choice feedback to lock in one design,
+        write a design.md record, never write production component code, run the
+        app, or install dependencies, and hand the chosen design to write-spec
+        and write-bdd so the UI states feed the BDD scenarios.
+    assert:
+      - type: contains
+        value: design-explore
+      - type: contains
+        value: UI-facing features
+      - type: contains
+        value: design system
+      - type: contains
+        value: multiple-choice menus
+      - type: contains
+        value: 3-5 genuinely distinct options
+      - type: contains
+        value: self-contained HTML
+      - type: contains
+        value: WCAG 2.2 AA
+      - type: contains
+        value: Lighthouse
+      - type: contains
+        value: write-spec
+      - type: contains
+        value: write-bdd

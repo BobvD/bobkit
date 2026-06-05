@@ -70,7 +70,13 @@ Offer 2-3 approaches with a recommendation, presented as a single menu so the us
 
 Make each approach one menu option, recommended one first and labeled `(Recommended)`. In the option description state what it includes, what it skips, main risks, and effort; when the breakdown is detailed, put it in the option's `preview` field for a side-by-side comparison so the labels stay scannable. Ask the user to choose before treating an approach as accepted.
 
-### 4. Engineering Lock-In
+### 4. Design Exploration (UI-facing features)
+
+If the chosen approach has a visible UI surface — a new component, screen, form, or layout — invoke the `design-explore` skill before locking in engineering details. It detects the repo's design system, proposes 3-5 distinct options in a self-contained HTML preview, gets multiple-choice feedback, and returns a single locked-in design.
+
+Pass it the feature summary and the chosen approach. Carry its locked-in design (chosen option, the `design.html` / `design.md` paths, and the UI states it covers) into the engineering lock-in and the `write-spec` handoff below. Skip this step entirely for backend, CLI, library, or data-only work.
+
+### 5. Engineering Lock-In
 
 After the approach is chosen, make the implementation shape explicit:
 
@@ -80,16 +86,17 @@ After the approach is chosen, make the implementation shape explicit:
 - Testing: unit, integration, E2E, visual, migration, or eval coverage needed for confidence.
 - Rollout: migration, backfill, feature flag, compatibility, monitoring, docs, or release notes if relevant.
 
-Use ASCII diagrams for non-trivial flows or state machines. If the feature touches UI, identify reusable design-system pieces before proposing new components.
+Use ASCII diagrams for non-trivial flows or state machines. If the feature touches UI, build on the design locked in during step 4 rather than re-litigating it here.
 
-### 5. Hand off to `write-spec`
+### 6. Hand off to `write-spec`
 
 Once the product approach and engineering shape are locked in, do not produce the final spec inline. Invoke the `write-spec` skill and pass it the locked-in decisions as input:
 
 - Feature title and one-line summary.
 - The problem, audience, outcome, success criteria, and non-goals from step 2.
 - The chosen approach from step 3.
-- The interfaces, data flow, edge cases, testing, and rollout decisions from step 4. These become the spec's **Implementation Notes** section so an implementing AI agent does not re-litigate them.
+- The locked-in design from step 4 if the feature is UI-facing — the chosen option, the `design.html` / `design.md` paths, and the UI states it covers — so the spec's acceptance scenarios exercise those states.
+- The interfaces, data flow, edge cases, testing, and rollout decisions from step 5. These become the spec's **Implementation Notes** section so an implementing AI agent does not re-litigate them.
 - Any assumptions or defaults you chose without explicit user input.
 
 `write-spec` writes the spec file and reports the path plus the BDD handoff line. The brainstorm skill's job ends with the handoff — do not re-state what `write-spec` already reported, and do not ask "should I proceed?". The user can request implementation (or `$write-bdd`) after reviewing the spec.

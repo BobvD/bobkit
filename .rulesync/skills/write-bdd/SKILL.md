@@ -30,6 +30,8 @@ The input can be any of:
 
 If the input is ambiguous, ask the user to clarify before continuing. Do not invent scenarios.
 
+If a chosen design accompanies the spec (a `design.md` / `design.html` beside it, or design paths in the spec's Implementation Notes), read it and make sure the generated scenarios cover the UI states it documents — default, loading, empty, error, and success — not just the happy path.
+
 ### 2. Detect the testing setup
 
 Inspect the repository to figure out which BDD or test framework is already in use:
