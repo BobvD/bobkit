@@ -148,6 +148,7 @@ Use the structure below verbatim. Sections marked `*(mandatory)*` must be filled
 - **Success Criteria** — measurable means a number or a binary signal. "Users like it" is not measurable; "support ticket volume for X drops by 50%" is.
 - **Assumptions** — record any default you chose when the user did not specify (e.g., "Free Clerk plan is sufficient for v1"). This protects the user from silent decisions.
 - **Implementation Notes** — only locked-in product/architecture choices that another agent should treat as settled. Examples: which library variant, which auth flow, which UI pattern, what is out of scope. Do not write file-level implementation detail here — that belongs in the implementing agent's plan.
+- **Locked-in design** — if `design-explore` ran (a `design.html` / `design.md` sits beside this spec, or the brainstorm passed in a chosen design), record the chosen design and link those paths in Implementation Notes, and make sure the Acceptance Scenarios exercise the UI states it covers (default, loading, empty, error, success) so `write-bdd` can turn them into scenarios.
 
 ### 5. Report and hand off
 
